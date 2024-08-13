@@ -14,7 +14,5 @@ public interface Opcode {
 
     byte toByte();
 
-    Opcode fromRomByte(byte romByte);
-
     Consumer<Interpreter.InterpreterContext> getOpcodeFunc();
 }

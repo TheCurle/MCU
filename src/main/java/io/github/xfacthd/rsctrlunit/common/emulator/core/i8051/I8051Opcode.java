@@ -429,53 +429,53 @@ public enum I8051Opcode implements Opcode
     //Regular 0xB4-0xBF
     CJNE_ACC_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("A", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = ctx.ram.readByte(Constants.ADDRESS_ACCUMULATOR);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_ACC_MEM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("A", ParseHelpers::parseAddressOperand), ctx -> {
         int address = ctx.readRomAndIncrementPC() & 0xFF;
         int offset = ctx.readRomAndIncrementPC();
         byte left = ctx.ram.readByte(Constants.ADDRESS_ACCUMULATOR);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.ram.readByte(address), offset);
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.ram.readByte(address), offset);
     }),
     CJNE_IR0_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("@R0", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterIndirect(ctx.ram, ctx.romByte & 0x1);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_IR1_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("@R1", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterIndirect(ctx.ram, ctx.romByte & 0x1);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_DR0_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("R0", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterDirect(ctx.ram, ctx.romByte & 0b00000111);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_DR1_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("R1", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterDirect(ctx.ram, ctx.romByte & 0b00000111);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_DR2_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("R2", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterDirect(ctx.ram, ctx.romByte & 0b00000111);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_DR3_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("R3", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterDirect(ctx.ram, ctx.romByte & 0b00000111);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_DR4_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("R4", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterDirect(ctx.ram, ctx.romByte & 0b00000111);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_DR5_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("R5", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterDirect(ctx.ram, ctx.romByte & 0b00000111);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_DR6_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("R6", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterDirect(ctx.ram, ctx.romByte & 0b00000111);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     CJNE_DR7_IMM    ("CJNE",    3, 2, ParseHelpers.makeThreeArgJumpParser("R7", ParseHelpers::parseImmediateOperand), ctx -> {
         byte left = OpcodeHelpers.readRegisterDirect(ctx.ram, ctx.romByte & 0b00000111);
-        OpcodeHelpers.compareJumpNotEqual(this, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
+        OpcodeHelpers.compareJumpNotEqual(ctx, ctx.ram, left, ctx.readRomAndIncrementPC(), ctx.readRomAndIncrementPC());
     }),
     //Irregular 0xC0-0xC3
     PUSH            ("PUSH",    1, 1, ParseHelpers.makeOneAddressArgParser(), ctx -> {
@@ -609,10 +609,10 @@ public enum I8051Opcode implements Opcode
     })),
     DJNZ_MEM        ("DJNZ",    2, 2, ParseHelpers.makeTwoArgJumpParser(ParseHelpers::parseAddressOperand), ctx -> {
         int address = ctx.readRomAndIncrementPC() & 0xFF;
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, ctx.ram.readByte(address), ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, ctx.ram.readByte(address), ctx.readRomAndIncrementPC());
         ctx.ram.writeByte(address, result);
     }),
-    XCHD_IR0        ("XCHD",    2, 0, ParseHelpers.makeTwoConstArgParser("A", "@R0"), ctx -> OpcodeHelpers.readModifyWriteAccumulatorWithArg(ram, (byte) (romByte & 0x1), (modRam, value, arg) ->
+    XCHD_IR0        ("XCHD",    2, 0, ParseHelpers.makeTwoConstArgParser("A", "@R0"), ctx -> OpcodeHelpers.readModifyWriteAccumulatorWithArg(ctx.ram, (byte) (ctx.romByte & 0x1), (modRam, value, arg) ->
     {
         int register = arg & 0xFF;
         byte regValue = OpcodeHelpers.readRegisterIndirect(modRam, register);
@@ -620,7 +620,7 @@ public enum I8051Opcode implements Opcode
         OpcodeHelpers.writeRegisterIndirect(modRam, register, newRegValue);
         return (value & 0xF0) | (regValue & 0x0F);
     })),
-    XCHD_IR1        ("XCHD",    2, 0, ParseHelpers.makeTwoConstArgParser("A", "@R1"), ctx -> OpcodeHelpers.readModifyWriteAccumulatorWithArg(ram, (byte) (romByte & 0x1), (modRam, value, arg) ->
+    XCHD_IR1        ("XCHD",    2, 0, ParseHelpers.makeTwoConstArgParser("A", "@R1"), ctx -> OpcodeHelpers.readModifyWriteAccumulatorWithArg(ctx.ram, (byte) (ctx.romByte & 0x1), (modRam, value, arg) ->
     {
         int register = arg & 0xFF;
         byte regValue = OpcodeHelpers.readRegisterIndirect(modRam, register);
@@ -631,49 +631,49 @@ public enum I8051Opcode implements Opcode
     DJNZ_DR0        ("DJNZ",    2, 1, ParseHelpers.makeTwoArgJumpParser("R0"), ctx -> {
         int register = ctx.romByte & 0b00000111;
         byte value = OpcodeHelpers.readRegisterDirect(ctx.ram, register);
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, value, ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, value, ctx.readRomAndIncrementPC());
         OpcodeHelpers.writeRegisterDirect(ctx.ram, register, result);
     }),
     DJNZ_DR1        ("DJNZ",    2, 1, ParseHelpers.makeTwoArgJumpParser("R1"), ctx -> {
         int register = ctx.romByte & 0b00000111;
         byte value = OpcodeHelpers.readRegisterDirect(ctx.ram, register);
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, value, ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, value, ctx.readRomAndIncrementPC());
         OpcodeHelpers.writeRegisterDirect(ctx.ram, register, result);
     }),
     DJNZ_DR2        ("DJNZ",    2, 1, ParseHelpers.makeTwoArgJumpParser("R2"), ctx -> {
         int register = ctx.romByte & 0b00000111;
         byte value = OpcodeHelpers.readRegisterDirect(ctx.ram, register);
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, value, ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, value, ctx.readRomAndIncrementPC());
         OpcodeHelpers.writeRegisterDirect(ctx.ram, register, result);
     }),
     DJNZ_DR3        ("DJNZ",    2, 1, ParseHelpers.makeTwoArgJumpParser("R3"), ctx -> {
         int register = ctx.romByte & 0b00000111;
         byte value = OpcodeHelpers.readRegisterDirect(ctx.ram, register);
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, value, ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, value, ctx.readRomAndIncrementPC());
         OpcodeHelpers.writeRegisterDirect(ctx.ram, register, result);
     }),
     DJNZ_DR4        ("DJNZ",    2, 1, ParseHelpers.makeTwoArgJumpParser("R4"), ctx -> {
         int register = ctx.romByte & 0b00000111;
         byte value = OpcodeHelpers.readRegisterDirect(ctx.ram, register);
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, value, ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, value, ctx.readRomAndIncrementPC());
         OpcodeHelpers.writeRegisterDirect(ctx.ram, register, result);
     }),
     DJNZ_DR5        ("DJNZ",    2, 1, ParseHelpers.makeTwoArgJumpParser("R5"), ctx -> {
         int register = ctx.romByte & 0b00000111;
         byte value = OpcodeHelpers.readRegisterDirect(ctx.ram, register);
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, value, ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, value, ctx.readRomAndIncrementPC());
         OpcodeHelpers.writeRegisterDirect(ctx.ram, register, result);
     }),
     DJNZ_DR6        ("DJNZ",    2, 1, ParseHelpers.makeTwoArgJumpParser("R6"), ctx -> {
         int register = ctx.romByte & 0b00000111;
         byte value = OpcodeHelpers.readRegisterDirect(ctx.ram, register);
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, value, ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, value, ctx.readRomAndIncrementPC());
         OpcodeHelpers.writeRegisterDirect(ctx.ram, register, result);
     }),
     DJNZ_DR7        ("DJNZ",    2, 1, ParseHelpers.makeTwoArgJumpParser("R7"), ctx -> {
         int register = ctx.romByte & 0b00000111;
         byte value = OpcodeHelpers.readRegisterDirect(ctx.ram, register);
-        byte result = OpcodeHelpers.decrementJumpNotZero(this, value, ctx.readRomAndIncrementPC());
+        byte result = OpcodeHelpers.decrementJumpNotZero(ctx, value, ctx.readRomAndIncrementPC());
         OpcodeHelpers.writeRegisterDirect(ctx.ram, register, result);
     }),
     //Irregular 0xE0-0xE3
@@ -749,8 +749,8 @@ public enum I8051Opcode implements Opcode
     MOV_DR7_ACC     ("MOV",     2, 0, ParseHelpers.makeTwoConstArgParser("R7", "A"), 2, ctx -> OpcodeHelpers.writeRegisterDirect(ctx.ram, ctx.romByte & 0b00000111, ctx.ram.readByte(Constants.ADDRESS_ACCUMULATOR))),
     ;
 
-    private static final I8051Opcode[] OPCODES = values();
-    private static final Map<String, List<I8051Opcode>> OPCODES_BY_MNEMONIC = Util.make(new HashMap<>(), map ->
+    public static final I8051Opcode[] OPCODES = values();
+    public static final Map<String, List<I8051Opcode>> OPCODES_BY_MNEMONIC = Util.make(new HashMap<>(), map ->
     {
         for (I8051Opcode opcode : OPCODES)
         {
@@ -842,8 +842,8 @@ public enum I8051Opcode implements Opcode
         return ErrorNode.invalidOperand(opcodes.getFirst(), operands, line);
     }
 
-    public I8051Opcode fromRomByte(byte romByte)
-    {
-        return OPCODES[romByte & 0xFF];
+    @Override
+    public Consumer<Interpreter.InterpreterContext> getOpcodeFunc() {
+        return func;
     }
 }

@@ -2,6 +2,7 @@ package io.github.xfacthd.rsctrlunit.common.emulator.interpreter;
 
 import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.emulator.core.i8051.I8051Opcode;
+import io.github.xfacthd.rsctrlunit.common.emulator.opcode.Opcode;
 import io.github.xfacthd.rsctrlunit.common.emulator.opcode.OpcodeHelpers;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.*;
 import io.github.xfacthd.rsctrlunit.common.util.Utils;
@@ -112,8 +113,7 @@ public final class Interpreter
         }
 
         context.romByte = context.readRomAndIncrementPC();
-        I8051Opcode opcode = I8051Opcode.NOP.fromRomByte(context.romByte);
-
+        Opcode opcode = context.core.opcodeFunc.apply(context.romByte);
         opcode.getOpcodeFunc().accept(context);
     }
 

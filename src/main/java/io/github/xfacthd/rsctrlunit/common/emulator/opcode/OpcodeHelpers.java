@@ -135,7 +135,7 @@ public final class OpcodeHelpers
         ram.write(address, value);
     }
 
-    public static void compareJumpNotEqual(Interpreter interpreter, RAM ram, byte left, byte right, int offset)
+    public static void compareJumpNotEqual(Interpreter.InterpreterContext interpreter, RAM ram, byte left, byte right, int offset)
     {
         if (left != right)
         {
@@ -144,7 +144,7 @@ public final class OpcodeHelpers
         ram.writeBit(Constants.BIT_ADDRESS_CARRY, BitWriteMode.of(left < right));
     }
 
-    public static byte decrementJumpNotZero(Interpreter interpreter, int value, int offset)
+    public static byte decrementJumpNotZero(Interpreter.InterpreterContext interpreter, int value, int offset)
     {
         byte result = (byte) (value - (byte) 1);
         if ((result & 0xFF) != 0)
