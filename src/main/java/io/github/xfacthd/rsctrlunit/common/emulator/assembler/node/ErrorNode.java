@@ -1,13 +1,13 @@
 package io.github.xfacthd.rsctrlunit.common.emulator.assembler.node;
 
-import io.github.xfacthd.rsctrlunit.common.emulator.opcode.Opcode;
+import io.github.xfacthd.rsctrlunit.common.emulator.core.i8051.I8051Opcode;
 
 import java.util.Arrays;
 import java.util.Locale;
 
 public record ErrorNode(int line, String error) implements Node
 {
-    public static ErrorNode operandCount(Opcode opcode, int operands, int line)
+    public static ErrorNode operandCount(I8051Opcode opcode, int operands, int line)
     {
         return new ErrorNode(line, String.format(
                 Locale.ROOT,
@@ -16,7 +16,7 @@ public record ErrorNode(int line, String error) implements Node
         ));
     }
 
-    public static ErrorNode invalidOperand(Opcode opcode, String[] operands, int line)
+    public static ErrorNode invalidOperand(I8051Opcode opcode, String[] operands, int line)
     {
         return new ErrorNode(line, String.format(
                 Locale.ROOT,

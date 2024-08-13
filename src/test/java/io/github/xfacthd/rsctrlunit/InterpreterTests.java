@@ -1,7 +1,7 @@
 package io.github.xfacthd.rsctrlunit;
 
 import io.github.xfacthd.rsctrlunit.common.emulator.interpreter.Interpreter;
-import io.github.xfacthd.rsctrlunit.common.emulator.opcode.Opcode;
+import io.github.xfacthd.rsctrlunit.common.emulator.core.i8051.I8051Opcode;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Constants;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
@@ -11,75 +11,75 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings("CodeBlock2Expr")
 public class InterpreterTests
 {
-    private static final Opcode[] AJMP = new Opcode[] { Opcode.AJMP_000, Opcode.AJMP_001, Opcode.AJMP_010, Opcode.AJMP_011, Opcode.AJMP_100, Opcode.AJMP_101, Opcode.AJMP_110, Opcode.AJMP_111 };
-    private static final Opcode[] ACALL = new Opcode[] { Opcode.ACALL_000, Opcode.ACALL_001, Opcode.ACALL_010, Opcode.ACALL_011, Opcode.ACALL_100, Opcode.ACALL_101, Opcode.ACALL_110, Opcode.ACALL_111 };
-    private static final Opcode[] CJNE_IRN_IMM = new Opcode[] { Opcode.CJNE_IR0_IMM, Opcode.CJNE_IR1_IMM };
-    private static final Opcode[] CJNE_DRN_IMM = new Opcode[] { Opcode.CJNE_DR0_IMM, Opcode.CJNE_DR1_IMM, Opcode.CJNE_DR2_IMM, Opcode.CJNE_DR3_IMM, Opcode.CJNE_DR4_IMM, Opcode.CJNE_DR5_IMM, Opcode.CJNE_DR6_IMM, Opcode.CJNE_DR7_IMM };
-    private static final Opcode[] DJNZ_DRN = new Opcode[] { Opcode.DJNZ_DR0, Opcode.DJNZ_DR1, Opcode.DJNZ_DR2, Opcode.DJNZ_DR3, Opcode.DJNZ_DR4, Opcode.DJNZ_DR5, Opcode.DJNZ_DR6, Opcode.DJNZ_DR7, };
-    private static final Opcode[] INC_IRN = new Opcode[] { Opcode.INC_IR0, Opcode.INC_IR1 };
-    private static final Opcode[] INC_DRN = new Opcode[] { Opcode.INC_DR0, Opcode.INC_DR1, Opcode.INC_DR2, Opcode.INC_DR3, Opcode.INC_DR4, Opcode.INC_DR5, Opcode.INC_DR6, Opcode.INC_DR7 };
-    private static final Opcode[] DEC_IRN = new Opcode[] { Opcode.DEC_IR0, Opcode.DEC_IR1 };
-    private static final Opcode[] DEC_DRN = new Opcode[] { Opcode.DEC_DR0, Opcode.DEC_DR1, Opcode.DEC_DR2, Opcode.DEC_DR3, Opcode.DEC_DR4, Opcode.DEC_DR5, Opcode.DEC_DR6, Opcode.DEC_DR7 };
-    private static final Opcode[] ADD_IRN = new Opcode[] { Opcode.ADD_IR0, Opcode.ADD_IR1 };
-    private static final Opcode[] ADD_DRN = new Opcode[] { Opcode.ADD_DR0, Opcode.ADD_DR1, Opcode.ADD_DR2, Opcode.ADD_DR3, Opcode.ADD_DR4, Opcode.ADD_DR5, Opcode.ADD_DR6, Opcode.ADD_DR7 };
-    private static final Opcode[] ADDC_IRN = new Opcode[] { Opcode.ADDC_IR0, Opcode.ADDC_IR1 };
-    private static final Opcode[] ADDC_DRN = new Opcode[] { Opcode.ADDC_DR0, Opcode.ADDC_DR1, Opcode.ADDC_DR2, Opcode.ADDC_DR3, Opcode.ADDC_DR4, Opcode.ADDC_DR5, Opcode.ADDC_DR6, Opcode.ADDC_DR7 };
-    private static final Opcode[] ORL_IRN = new Opcode[] { Opcode.ORL_IR0, Opcode.ORL_IR1 };
-    private static final Opcode[] ORL_DRN = new Opcode[] { Opcode.ORL_DR0, Opcode.ORL_DR1, Opcode.ORL_DR2, Opcode.ORL_DR3, Opcode.ORL_DR4, Opcode.ORL_DR5, Opcode.ORL_DR6, Opcode.ORL_DR7 };
-    private static final Opcode[] ANL_IRN = new Opcode[] { Opcode.ANL_IR0, Opcode.ANL_IR1 };
-    private static final Opcode[] ANL_DRN = new Opcode[] { Opcode.ANL_DR0, Opcode.ANL_DR1, Opcode.ANL_DR2, Opcode.ANL_DR3, Opcode.ANL_DR4, Opcode.ANL_DR5, Opcode.ANL_DR6, Opcode.ANL_DR7 };
-    private static final Opcode[] XRL_IRN = new Opcode[] { Opcode.XRL_IR0, Opcode.XRL_IR1 };
-    private static final Opcode[] XRL_DRN = new Opcode[] { Opcode.XRL_DR0, Opcode.XRL_DR1, Opcode.XRL_DR2, Opcode.XRL_DR3, Opcode.XRL_DR4, Opcode.XRL_DR5, Opcode.XRL_DR6, Opcode.XRL_DR7 };
-    private static final Opcode[] SUBB_IRN = new Opcode[] { Opcode.SUBB_IR0, Opcode.SUBB_IR1 };
-    private static final Opcode[] SUBB_DRN = new Opcode[] { Opcode.SUBB_DR0, Opcode.SUBB_DR1, Opcode.SUBB_DR2, Opcode.SUBB_DR3, Opcode.SUBB_DR4, Opcode.SUBB_DR5, Opcode.SUBB_DR6, Opcode.SUBB_DR7 };
-    private static final Opcode[] XCH_IRN = new Opcode[] { Opcode.XCH_IR0, Opcode.XCH_IR1 };
-    private static final Opcode[] XCH_DRN = new Opcode[] { Opcode.XCH_DR0, Opcode.XCH_DR1, Opcode.XCH_DR2, Opcode.XCH_DR3, Opcode.XCH_DR4, Opcode.XCH_DR5, Opcode.XCH_DR6, Opcode.XCH_DR7 };
-    private static final Opcode[] XCHD_IRN = new Opcode[] { Opcode.XCHD_IR0, Opcode.XCHD_IR1 };
-    private static final Opcode[] MOV_IRN_IMM = new Opcode[] { Opcode.MOV_IR0_IMM, Opcode.MOV_IR1_IMM };
-    private static final Opcode[] MOV_DRN_IMM = new Opcode[] { Opcode.MOV_DR0_IMM, Opcode.MOV_DR1_IMM, Opcode.MOV_DR2_IMM, Opcode.MOV_DR3_IMM, Opcode.MOV_DR4_IMM, Opcode.MOV_DR5_IMM, Opcode.MOV_DR6_IMM, Opcode.MOV_DR7_IMM };
-    private static final Opcode[] MOV_MEM_IRN = new Opcode[] { Opcode.MOV_MEM_IR0, Opcode.MOV_MEM_IR1 };
-    private static final Opcode[] MOV_MEM_DRN = new Opcode[] { Opcode.MOV_MEM_DR0, Opcode.MOV_MEM_DR1, Opcode.MOV_MEM_DR2, Opcode.MOV_MEM_DR3, Opcode.MOV_MEM_DR4, Opcode.MOV_MEM_DR5, Opcode.MOV_MEM_DR6, Opcode.MOV_MEM_DR7 };
-    private static final Opcode[] MOV_ACC_IRN = new Opcode[] { Opcode.MOV_ACC_IR0, Opcode.MOV_ACC_IR1 };
-    private static final Opcode[] MOV_ACC_DRN = new Opcode[] { Opcode.MOV_ACC_DR0, Opcode.MOV_ACC_DR1, Opcode.MOV_ACC_DR2, Opcode.MOV_ACC_DR3, Opcode.MOV_ACC_DR4, Opcode.MOV_ACC_DR5, Opcode.MOV_ACC_DR6, Opcode.MOV_ACC_DR7 };
-    private static final Opcode[] MOV_IRN_ACC = new Opcode[] { Opcode.MOV_IR0_ACC, Opcode.MOV_IR1_ACC };
-    private static final Opcode[] MOV_DRN_ACC = new Opcode[] { Opcode.MOV_DR0_ACC, Opcode.MOV_DR1_ACC, Opcode.MOV_DR2_ACC, Opcode.MOV_DR3_ACC, Opcode.MOV_DR4_ACC, Opcode.MOV_DR5_ACC, Opcode.MOV_DR6_ACC, Opcode.MOV_DR7_ACC };
-    private static final Opcode[] MOVX_ACC_IRN = new Opcode[] { Opcode.MOVX_ACC_IR0, Opcode.MOVX_ACC_IR1 };
-    private static final Opcode[] MOVX_IRN_ACC = new Opcode[] { Opcode.MOVX_IR0_ACC, Opcode.MOVX_IR1_ACC };
+    private static final I8051Opcode[] AJMP = new I8051Opcode[] { I8051Opcode.AJMP_000, I8051Opcode.AJMP_001, I8051Opcode.AJMP_010, I8051Opcode.AJMP_011, I8051Opcode.AJMP_100, I8051Opcode.AJMP_101, I8051Opcode.AJMP_110, I8051Opcode.AJMP_111 };
+    private static final I8051Opcode[] ACALL = new I8051Opcode[] { I8051Opcode.ACALL_000, I8051Opcode.ACALL_001, I8051Opcode.ACALL_010, I8051Opcode.ACALL_011, I8051Opcode.ACALL_100, I8051Opcode.ACALL_101, I8051Opcode.ACALL_110, I8051Opcode.ACALL_111 };
+    private static final I8051Opcode[] CJNE_IRN_IMM = new I8051Opcode[] { I8051Opcode.CJNE_IR0_IMM, I8051Opcode.CJNE_IR1_IMM };
+    private static final I8051Opcode[] CJNE_DRN_IMM = new I8051Opcode[] { I8051Opcode.CJNE_DR0_IMM, I8051Opcode.CJNE_DR1_IMM, I8051Opcode.CJNE_DR2_IMM, I8051Opcode.CJNE_DR3_IMM, I8051Opcode.CJNE_DR4_IMM, I8051Opcode.CJNE_DR5_IMM, I8051Opcode.CJNE_DR6_IMM, I8051Opcode.CJNE_DR7_IMM };
+    private static final I8051Opcode[] DJNZ_DRN = new I8051Opcode[] { I8051Opcode.DJNZ_DR0, I8051Opcode.DJNZ_DR1, I8051Opcode.DJNZ_DR2, I8051Opcode.DJNZ_DR3, I8051Opcode.DJNZ_DR4, I8051Opcode.DJNZ_DR5, I8051Opcode.DJNZ_DR6, I8051Opcode.DJNZ_DR7, };
+    private static final I8051Opcode[] INC_IRN = new I8051Opcode[] { I8051Opcode.INC_IR0, I8051Opcode.INC_IR1 };
+    private static final I8051Opcode[] INC_DRN = new I8051Opcode[] { I8051Opcode.INC_DR0, I8051Opcode.INC_DR1, I8051Opcode.INC_DR2, I8051Opcode.INC_DR3, I8051Opcode.INC_DR4, I8051Opcode.INC_DR5, I8051Opcode.INC_DR6, I8051Opcode.INC_DR7 };
+    private static final I8051Opcode[] DEC_IRN = new I8051Opcode[] { I8051Opcode.DEC_IR0, I8051Opcode.DEC_IR1 };
+    private static final I8051Opcode[] DEC_DRN = new I8051Opcode[] { I8051Opcode.DEC_DR0, I8051Opcode.DEC_DR1, I8051Opcode.DEC_DR2, I8051Opcode.DEC_DR3, I8051Opcode.DEC_DR4, I8051Opcode.DEC_DR5, I8051Opcode.DEC_DR6, I8051Opcode.DEC_DR7 };
+    private static final I8051Opcode[] ADD_IRN = new I8051Opcode[] { I8051Opcode.ADD_IR0, I8051Opcode.ADD_IR1 };
+    private static final I8051Opcode[] ADD_DRN = new I8051Opcode[] { I8051Opcode.ADD_DR0, I8051Opcode.ADD_DR1, I8051Opcode.ADD_DR2, I8051Opcode.ADD_DR3, I8051Opcode.ADD_DR4, I8051Opcode.ADD_DR5, I8051Opcode.ADD_DR6, I8051Opcode.ADD_DR7 };
+    private static final I8051Opcode[] ADDC_IRN = new I8051Opcode[] { I8051Opcode.ADDC_IR0, I8051Opcode.ADDC_IR1 };
+    private static final I8051Opcode[] ADDC_DRN = new I8051Opcode[] { I8051Opcode.ADDC_DR0, I8051Opcode.ADDC_DR1, I8051Opcode.ADDC_DR2, I8051Opcode.ADDC_DR3, I8051Opcode.ADDC_DR4, I8051Opcode.ADDC_DR5, I8051Opcode.ADDC_DR6, I8051Opcode.ADDC_DR7 };
+    private static final I8051Opcode[] ORL_IRN = new I8051Opcode[] { I8051Opcode.ORL_IR0, I8051Opcode.ORL_IR1 };
+    private static final I8051Opcode[] ORL_DRN = new I8051Opcode[] { I8051Opcode.ORL_DR0, I8051Opcode.ORL_DR1, I8051Opcode.ORL_DR2, I8051Opcode.ORL_DR3, I8051Opcode.ORL_DR4, I8051Opcode.ORL_DR5, I8051Opcode.ORL_DR6, I8051Opcode.ORL_DR7 };
+    private static final I8051Opcode[] ANL_IRN = new I8051Opcode[] { I8051Opcode.ANL_IR0, I8051Opcode.ANL_IR1 };
+    private static final I8051Opcode[] ANL_DRN = new I8051Opcode[] { I8051Opcode.ANL_DR0, I8051Opcode.ANL_DR1, I8051Opcode.ANL_DR2, I8051Opcode.ANL_DR3, I8051Opcode.ANL_DR4, I8051Opcode.ANL_DR5, I8051Opcode.ANL_DR6, I8051Opcode.ANL_DR7 };
+    private static final I8051Opcode[] XRL_IRN = new I8051Opcode[] { I8051Opcode.XRL_IR0, I8051Opcode.XRL_IR1 };
+    private static final I8051Opcode[] XRL_DRN = new I8051Opcode[] { I8051Opcode.XRL_DR0, I8051Opcode.XRL_DR1, I8051Opcode.XRL_DR2, I8051Opcode.XRL_DR3, I8051Opcode.XRL_DR4, I8051Opcode.XRL_DR5, I8051Opcode.XRL_DR6, I8051Opcode.XRL_DR7 };
+    private static final I8051Opcode[] SUBB_IRN = new I8051Opcode[] { I8051Opcode.SUBB_IR0, I8051Opcode.SUBB_IR1 };
+    private static final I8051Opcode[] SUBB_DRN = new I8051Opcode[] { I8051Opcode.SUBB_DR0, I8051Opcode.SUBB_DR1, I8051Opcode.SUBB_DR2, I8051Opcode.SUBB_DR3, I8051Opcode.SUBB_DR4, I8051Opcode.SUBB_DR5, I8051Opcode.SUBB_DR6, I8051Opcode.SUBB_DR7 };
+    private static final I8051Opcode[] XCH_IRN = new I8051Opcode[] { I8051Opcode.XCH_IR0, I8051Opcode.XCH_IR1 };
+    private static final I8051Opcode[] XCH_DRN = new I8051Opcode[] { I8051Opcode.XCH_DR0, I8051Opcode.XCH_DR1, I8051Opcode.XCH_DR2, I8051Opcode.XCH_DR3, I8051Opcode.XCH_DR4, I8051Opcode.XCH_DR5, I8051Opcode.XCH_DR6, I8051Opcode.XCH_DR7 };
+    private static final I8051Opcode[] XCHD_IRN = new I8051Opcode[] { I8051Opcode.XCHD_IR0, I8051Opcode.XCHD_IR1 };
+    private static final I8051Opcode[] MOV_IRN_IMM = new I8051Opcode[] { I8051Opcode.MOV_IR0_IMM, I8051Opcode.MOV_IR1_IMM };
+    private static final I8051Opcode[] MOV_DRN_IMM = new I8051Opcode[] { I8051Opcode.MOV_DR0_IMM, I8051Opcode.MOV_DR1_IMM, I8051Opcode.MOV_DR2_IMM, I8051Opcode.MOV_DR3_IMM, I8051Opcode.MOV_DR4_IMM, I8051Opcode.MOV_DR5_IMM, I8051Opcode.MOV_DR6_IMM, I8051Opcode.MOV_DR7_IMM };
+    private static final I8051Opcode[] MOV_MEM_IRN = new I8051Opcode[] { I8051Opcode.MOV_MEM_IR0, I8051Opcode.MOV_MEM_IR1 };
+    private static final I8051Opcode[] MOV_MEM_DRN = new I8051Opcode[] { I8051Opcode.MOV_MEM_DR0, I8051Opcode.MOV_MEM_DR1, I8051Opcode.MOV_MEM_DR2, I8051Opcode.MOV_MEM_DR3, I8051Opcode.MOV_MEM_DR4, I8051Opcode.MOV_MEM_DR5, I8051Opcode.MOV_MEM_DR6, I8051Opcode.MOV_MEM_DR7 };
+    private static final I8051Opcode[] MOV_ACC_IRN = new I8051Opcode[] { I8051Opcode.MOV_ACC_IR0, I8051Opcode.MOV_ACC_IR1 };
+    private static final I8051Opcode[] MOV_ACC_DRN = new I8051Opcode[] { I8051Opcode.MOV_ACC_DR0, I8051Opcode.MOV_ACC_DR1, I8051Opcode.MOV_ACC_DR2, I8051Opcode.MOV_ACC_DR3, I8051Opcode.MOV_ACC_DR4, I8051Opcode.MOV_ACC_DR5, I8051Opcode.MOV_ACC_DR6, I8051Opcode.MOV_ACC_DR7 };
+    private static final I8051Opcode[] MOV_IRN_ACC = new I8051Opcode[] { I8051Opcode.MOV_IR0_ACC, I8051Opcode.MOV_IR1_ACC };
+    private static final I8051Opcode[] MOV_DRN_ACC = new I8051Opcode[] { I8051Opcode.MOV_DR0_ACC, I8051Opcode.MOV_DR1_ACC, I8051Opcode.MOV_DR2_ACC, I8051Opcode.MOV_DR3_ACC, I8051Opcode.MOV_DR4_ACC, I8051Opcode.MOV_DR5_ACC, I8051Opcode.MOV_DR6_ACC, I8051Opcode.MOV_DR7_ACC };
+    private static final I8051Opcode[] MOVX_ACC_IRN = new I8051Opcode[] { I8051Opcode.MOVX_ACC_IR0, I8051Opcode.MOVX_ACC_IR1 };
+    private static final I8051Opcode[] MOVX_IRN_ACC = new I8051Opcode[] { I8051Opcode.MOVX_IR0_ACC, I8051Opcode.MOVX_IR1_ACC };
 
     @Test
     void testNop()
     {
-        test(new int[] { Opcode.NOP.toByte() }, 0, ram -> {}, ram -> {}, 1);
+        test(new int[] { I8051Opcode.NOP.toByte() }, 0, ram -> {}, ram -> {}, 1);
     }
 
     @Test
     void testSjmp_Forward()
     {
-        test(new int[] { Opcode.SJMP.toByte(), 2 }, 0, ram -> {}, ram -> {}, 4);
+        test(new int[] { I8051Opcode.SJMP.toByte(), 2 }, 0, ram -> {}, ram -> {}, 4);
     }
 
     @Test
     void testSjmp_Forward_Rollover()
     {
-        test(new int[] { Opcode.SJMP.toByte(), 2 }, 65533, ram -> {}, ram -> {}, 1);
+        test(new int[] { I8051Opcode.SJMP.toByte(), 2 }, 65533, ram -> {}, ram -> {}, 1);
     }
 
     @Test
     void testSjmp_Backward()
     {
-        test(new int[] { Opcode.SJMP.toByte(), -2 }, 0, ram -> {}, ram -> {}, 0);
+        test(new int[] { I8051Opcode.SJMP.toByte(), -2 }, 0, ram -> {}, ram -> {}, 0);
     }
 
     @Test
     void testSjmp_Backward_Rollover()
     {
-        test(new int[] { Opcode.SJMP.toByte(), -4 }, 0, ram -> {}, ram -> {}, 65534);
+        test(new int[] { I8051Opcode.SJMP.toByte(), -4 }, 0, ram -> {}, ram -> {}, 65534);
     }
 
     @Test
     void testJmp()
     {
-        test(new int[] { Opcode.JMP.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.JMP.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_LOWER, 3);
         }, ram -> {}, 5);
@@ -110,13 +110,13 @@ public class InterpreterTests
     @Test
     void testLjmp()
     {
-        test(new int[] { Opcode.LJMP.toByte(), 2, 2 }, 0, ram -> {}, ram -> {}, 0x0202);
+        test(new int[] { I8051Opcode.LJMP.toByte(), 2, 2 }, 0, ram -> {}, ram -> {}, 0x0202);
     }
 
     @Test
     void testLcall()
     {
-        test(new int[] { Opcode.LCALL.toByte(), 2, 2 }, 2, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.LCALL.toByte(), 2, 2 }, 2, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_STACK_POINTER, Constants.INITIAL_STACK_POINTER + 2);
             ram.setRam(Constants.INITIAL_STACK_POINTER + 1, 5);
             ram.setRam(Constants.INITIAL_STACK_POINTER + 2, 0);
@@ -126,7 +126,7 @@ public class InterpreterTests
     @Test
     void testRet()
     {
-        test(new int[] { Opcode.RET.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RET.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STACK_POINTER, Constants.INITIAL_STACK_POINTER + 2);
             ram.setRam(Constants.INITIAL_STACK_POINTER + 1, 2);
             ram.setRam(Constants.INITIAL_STACK_POINTER + 2, 2);
@@ -138,7 +138,7 @@ public class InterpreterTests
     @Test
     void testReti()
     {
-        test(new int[] { Opcode.RETI.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RETI.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STACK_POINTER, Constants.INITIAL_STACK_POINTER + 2);
             ram.setRam(Constants.INITIAL_STACK_POINTER + 1, 2);
             ram.setRam(Constants.INITIAL_STACK_POINTER + 2, 2);
@@ -150,7 +150,7 @@ public class InterpreterTests
     @Test
     void testJbc_BitSet_Forward()
     {
-        test(new int[] { Opcode.JBC.toByte(), 0x8C, 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JBC.toByte(), 0x8C, 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x1A);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x0A);
@@ -160,7 +160,7 @@ public class InterpreterTests
     @Test
     void testJbc_BitSet_Backward()
     {
-        test(new int[] { Opcode.JBC.toByte(), 0x8C, -3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JBC.toByte(), 0x8C, -3 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x1A);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x0A);
@@ -170,7 +170,7 @@ public class InterpreterTests
     @Test
     void testJbc_BitClear()
     {
-        test(new int[] { Opcode.JBC.toByte(), 0x8C, 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JBC.toByte(), 0x8C, 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x0A);
         }, ram -> {}, 3);
     }
@@ -178,7 +178,7 @@ public class InterpreterTests
     @Test
     void testJb_BitSet_Forward()
     {
-        test(new int[] { Opcode.JB.toByte(), 0x8C, 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JB.toByte(), 0x8C, 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x1A);
         }, ram -> {}, 7);
     }
@@ -186,7 +186,7 @@ public class InterpreterTests
     @Test
     void testJb_BitSet_Backward()
     {
-        test(new int[] { Opcode.JB.toByte(), 0x8C, -3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JB.toByte(), 0x8C, -3 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x1A);
         }, ram -> {}, 0);
     }
@@ -194,7 +194,7 @@ public class InterpreterTests
     @Test
     void testJb_BitClear()
     {
-        test(new int[] { Opcode.JB.toByte(), 0x8C, 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JB.toByte(), 0x8C, 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x0A);
         }, ram -> {}, 3);
     }
@@ -202,7 +202,7 @@ public class InterpreterTests
     @Test
     void testJnb_BitSet()
     {
-        test(new int[] { Opcode.JNB.toByte(), 0x8C, 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNB.toByte(), 0x8C, 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x1A);
         }, ram -> {}, 3);
     }
@@ -210,7 +210,7 @@ public class InterpreterTests
     @Test
     void testJnb_BitClear_Forward()
     {
-        test(new int[] { Opcode.JNB.toByte(), 0x8C, 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNB.toByte(), 0x8C, 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x0A);
         }, ram -> {}, 7);
     }
@@ -218,7 +218,7 @@ public class InterpreterTests
     @Test
     void testJnb_BitClear_Backward()
     {
-        test(new int[] { Opcode.JNB.toByte(), 0x8C, -3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNB.toByte(), 0x8C, -3 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_TCON, 0x0A);
         }, ram -> {}, 0);
     }
@@ -226,7 +226,7 @@ public class InterpreterTests
     @Test
     void testJc_BitSet_Forward()
     {
-        test(new int[] { Opcode.JC.toByte(), 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JC.toByte(), 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {}, 6);
     }
@@ -234,7 +234,7 @@ public class InterpreterTests
     @Test
     void testJc_BitSet_Backward()
     {
-        test(new int[] { Opcode.JC.toByte(), -2 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JC.toByte(), -2 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {}, 0);
     }
@@ -242,7 +242,7 @@ public class InterpreterTests
     @Test
     void testJc_BitClear()
     {
-        test(new int[] { Opcode.JC.toByte(), 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JC.toByte(), 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
         }, ram -> {}, 2);
     }
@@ -250,7 +250,7 @@ public class InterpreterTests
     @Test
     void testJnc_BitSet()
     {
-        test(new int[] { Opcode.JNC.toByte(), 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNC.toByte(), 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {}, 2);
     }
@@ -258,7 +258,7 @@ public class InterpreterTests
     @Test
     void testJnc_BitClear_Forward()
     {
-        test(new int[] { Opcode.JNC.toByte(), 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNC.toByte(), 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
         }, ram -> {}, 6);
     }
@@ -266,7 +266,7 @@ public class InterpreterTests
     @Test
     void testJnc_BitClear_Backward()
     {
-        test(new int[] { Opcode.JNC.toByte(), -2 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNC.toByte(), -2 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
         }, ram -> {}, 0);
     }
@@ -274,7 +274,7 @@ public class InterpreterTests
     @Test
     void testJz_AccZero_Forward()
     {
-        test(new int[] { Opcode.JZ.toByte(), 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JZ.toByte(), 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
         }, ram -> {}, 6);
     }
@@ -282,7 +282,7 @@ public class InterpreterTests
     @Test
     void testJz_AccZero_Backward()
     {
-        test(new int[] { Opcode.JZ.toByte(), -2 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JZ.toByte(), -2 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
         }, ram -> {}, 0);
     }
@@ -290,7 +290,7 @@ public class InterpreterTests
     @Test
     void testJz_AccNonZero()
     {
-        test(new int[] { Opcode.JZ.toByte(), 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JZ.toByte(), 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
         }, ram -> {}, 2);
     }
@@ -298,7 +298,7 @@ public class InterpreterTests
     @Test
     void testJnz_AccZero()
     {
-        test(new int[] { Opcode.JNZ.toByte(), 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNZ.toByte(), 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
         }, ram -> {}, 2);
     }
@@ -306,7 +306,7 @@ public class InterpreterTests
     @Test
     void testJnz_AccNonZero_Forward()
     {
-        test(new int[] { Opcode.JNZ.toByte(), 4 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNZ.toByte(), 4 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
         }, ram -> {}, 6);
     }
@@ -314,7 +314,7 @@ public class InterpreterTests
     @Test
     void testJnz_AccNonZero_Backward()
     {
-        test(new int[] { Opcode.JNZ.toByte(), -2 }, 0, ram -> {
+        test(new int[] { I8051Opcode.JNZ.toByte(), -2 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
         }, ram -> {}, 0);
     }
@@ -322,7 +322,7 @@ public class InterpreterTests
     @Test
     void testCjneAccImm_Lower_Forward()
     {
-        test(new int[] { Opcode.CJNE_ACC_IMM.toByte(), 4, 8 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_IMM.toByte(), 4, 8 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
@@ -332,7 +332,7 @@ public class InterpreterTests
     @Test
     void testCjneAccImm_Lower_Backward()
     {
-        test(new int[] { Opcode.CJNE_ACC_IMM.toByte(), 4, -3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_IMM.toByte(), 4, -3 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
@@ -342,7 +342,7 @@ public class InterpreterTests
     @Test
     void testCjneAccImm_Higher_Forward()
     {
-        test(new int[] { Opcode.CJNE_ACC_IMM.toByte(), 4, 8 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_IMM.toByte(), 4, 8 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 6);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
@@ -352,7 +352,7 @@ public class InterpreterTests
     @Test
     void testCjneAccImm_Higher_Backward()
     {
-        test(new int[] { Opcode.CJNE_ACC_IMM.toByte(), 4, -3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_IMM.toByte(), 4, -3 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 6);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
@@ -362,7 +362,7 @@ public class InterpreterTests
     @Test
     void testCjneAccImm_Equal()
     {
-        test(new int[] { Opcode.CJNE_ACC_IMM.toByte(), 4, 8 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_IMM.toByte(), 4, 8 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 4);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
@@ -372,7 +372,7 @@ public class InterpreterTests
     @Test
     void testCjneAccMem_Lower_Forward()
     {
-        test(new int[] { Opcode.CJNE_ACC_MEM.toByte(), 0, 8 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_MEM.toByte(), 0, 8 }, 0, ram -> {
             ram.setRam(0, 4);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
         }, ram -> {
@@ -383,7 +383,7 @@ public class InterpreterTests
     @Test
     void testCjneAccMem_Lower_Backward()
     {
-        test(new int[] { Opcode.CJNE_ACC_MEM.toByte(), 0, -3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_MEM.toByte(), 0, -3 }, 0, ram -> {
             ram.setRam(0, 4);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
         }, ram -> {
@@ -394,7 +394,7 @@ public class InterpreterTests
     @Test
     void testCjneAccMem_Higher_Forward()
     {
-        test(new int[] { Opcode.CJNE_ACC_MEM.toByte(), 0, 8 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_MEM.toByte(), 0, 8 }, 0, ram -> {
             ram.setRam(0, 4);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 6);
         }, ram -> {
@@ -405,7 +405,7 @@ public class InterpreterTests
     @Test
     void testCjneAccMem_Higher_Backward()
     {
-        test(new int[] { Opcode.CJNE_ACC_MEM.toByte(), 0, -3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_MEM.toByte(), 0, -3 }, 0, ram -> {
             ram.setRam(0, 4);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 6);
         }, ram -> {
@@ -416,7 +416,7 @@ public class InterpreterTests
     @Test
     void testCjneAccMem_Equal()
     {
-        test(new int[] { Opcode.CJNE_ACC_MEM.toByte(), 0, 8 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CJNE_ACC_MEM.toByte(), 0, 8 }, 0, ram -> {
             ram.setRam(0, 4);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 4);
         }, ram -> {
@@ -572,7 +572,7 @@ public class InterpreterTests
     @Test
     void testDjnzMem_NonZero_Forward()
     {
-        test(new int[] { Opcode.DJNZ_MEM.toByte(), 10, 8 }, 0, ram -> {
+        test(new int[] { I8051Opcode.DJNZ_MEM.toByte(), 10, 8 }, 0, ram -> {
             ram.setRam(10, 2);
         }, ram -> {
             ram.setRam(10, 1);
@@ -582,7 +582,7 @@ public class InterpreterTests
     @Test
     void testDjnzMem_NonZero_Backward()
     {
-        test(new int[] { Opcode.DJNZ_MEM.toByte(), 10, -3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.DJNZ_MEM.toByte(), 10, -3 }, 0, ram -> {
             ram.setRam(10, 2);
         }, ram -> {
             ram.setRam(10, 1);
@@ -592,7 +592,7 @@ public class InterpreterTests
     @Test
     void testDjnzMem_Zero()
     {
-        test(new int[] { Opcode.DJNZ_MEM.toByte(), 10, 8 }, 0, ram -> {
+        test(new int[] { I8051Opcode.DJNZ_MEM.toByte(), 10, 8 }, 0, ram -> {
             ram.setRam(10, 1);
         }, ram -> {
             ram.setRam(10, 0);
@@ -644,7 +644,7 @@ public class InterpreterTests
     @Test
     void testPush()
     {
-        test(new int[] { Opcode.PUSH.toByte(), 2 }, 0, ram -> {
+        test(new int[] { I8051Opcode.PUSH.toByte(), 2 }, 0, ram -> {
             ram.setRam(2, 10);
         }, ram -> {
             ram.setRam(8, 10);
@@ -655,7 +655,7 @@ public class InterpreterTests
     @Test
     void testPop()
     {
-        test(new int[] { Opcode.POP.toByte(), 2 }, 0, ram -> {
+        test(new int[] { I8051Opcode.POP.toByte(), 2 }, 0, ram -> {
             ram.setRam(8, 10);
             ram.setSfr(Constants.ADDRESS_STACK_POINTER, 8);
         }, ram -> {
@@ -667,7 +667,7 @@ public class InterpreterTests
     @Test
     void testRr_NoRollover()
     {
-        test(new int[] { Opcode.RR.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RR.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000010);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
@@ -678,7 +678,7 @@ public class InterpreterTests
     @Test
     void testRr_Rollover()
     {
-        test(new int[] { Opcode.RR.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RR.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b10000000);
@@ -689,7 +689,7 @@ public class InterpreterTests
     @Test
     void testRrc_CarryZeroToZero()
     {
-        test(new int[] { Opcode.RRC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RRC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000010);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
@@ -700,7 +700,7 @@ public class InterpreterTests
     @Test
     void testRrc_CarryZeroToOne()
     {
-        test(new int[] { Opcode.RRC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RRC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
@@ -711,7 +711,7 @@ public class InterpreterTests
     @Test
     void testRrc_CarryOneToOne()
     {
-        test(new int[] { Opcode.RRC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RRC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -723,7 +723,7 @@ public class InterpreterTests
     @Test
     void testRrc_CarryOneToZero()
     {
-        test(new int[] { Opcode.RRC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RRC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -735,7 +735,7 @@ public class InterpreterTests
     @Test
     void testRl_NoRollover()
     {
-        test(new int[] { Opcode.RL.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RL.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b01000000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b10000000);
@@ -746,7 +746,7 @@ public class InterpreterTests
     @Test
     void testRl_Rollover()
     {
-        test(new int[] { Opcode.RL.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RL.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b10000000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000001);
@@ -757,7 +757,7 @@ public class InterpreterTests
     @Test
     void testRlc_CarryZeroToZero()
     {
-        test(new int[] { Opcode.RLC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RLC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b01000000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b10000000);
@@ -768,7 +768,7 @@ public class InterpreterTests
     @Test
     void testRlc_CarryZeroToOne()
     {
-        test(new int[] { Opcode.RLC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RLC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b10000000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
@@ -779,7 +779,7 @@ public class InterpreterTests
     @Test
     void testRlc_CarryOneToOne()
     {
-        test(new int[] { Opcode.RLC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RLC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b10000000);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -791,7 +791,7 @@ public class InterpreterTests
     @Test
     void testRlc_CarryOneToZero()
     {
-        test(new int[] { Opcode.RLC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.RLC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -803,7 +803,7 @@ public class InterpreterTests
     @Test
     void testIncAcc()
     {
-        test(new int[] { Opcode.INC_ACC.toByte() }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.INC_ACC.toByte() }, 0, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 1);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000001);
         }, 1);
@@ -812,7 +812,7 @@ public class InterpreterTests
     @Test
     void testIncMem()
     {
-        test(new int[] { Opcode.INC_MEM.toByte(), 10 }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.INC_MEM.toByte(), 10 }, 0, ram -> {}, ram -> {
             ram.setRam(10, 1);
         }, 2);
     }
@@ -846,7 +846,7 @@ public class InterpreterTests
     @Test
     void testIncDptr_LsbOnly()
     {
-        test(new int[] { Opcode.INC_DPTR.toByte() }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.INC_DPTR.toByte() }, 0, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_LOWER, 1);
         }, 1);
     }
@@ -854,7 +854,7 @@ public class InterpreterTests
     @Test
     void testIncDptr_Both()
     {
-        test(new int[] { Opcode.INC_DPTR.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.INC_DPTR.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_LOWER, 255);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_LOWER, 0);
@@ -865,7 +865,7 @@ public class InterpreterTests
     @Test
     void testDecAcc()
     {
-        test(new int[] { Opcode.DEC_ACC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DEC_ACC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 1);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
@@ -875,7 +875,7 @@ public class InterpreterTests
     @Test
     void testDecMem()
     {
-        test(new int[] { Opcode.DEC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.DEC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setRam(10, 1);
         }, ram -> {
             ram.setRam(10, 0);
@@ -914,7 +914,7 @@ public class InterpreterTests
     @Test
     void testAddImm_NoAuxCarry_NoCarry_NoOverflow_LowNibble()
     {
-        test(new int[] { Opcode.ADD_IMM.toByte(), 3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_IMM.toByte(), 3 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 5);
@@ -925,7 +925,7 @@ public class InterpreterTests
     @Test
     void testAddImm_NoAuxCarry_NoCarry_NoOverflow_HighNibble()
     {
-        test(new int[] { Opcode.ADD_IMM.toByte(), 0x30 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_IMM.toByte(), 0x30 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x20);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x50);
@@ -936,7 +936,7 @@ public class InterpreterTests
     @Test
     void testAddImm_AuxCarry_NoCarry_NoOverflow()
     {
-        test(new int[] { Opcode.ADD_IMM.toByte(), 7 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_IMM.toByte(), 7 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 9);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 16);
@@ -947,7 +947,7 @@ public class InterpreterTests
     @Test
     void testAddImm_NoAuxCarry_Carry_NoOverflow()
     {
-        test(new int[] { Opcode.ADD_IMM.toByte(), 0x90 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_IMM.toByte(), 0x90 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x70);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
@@ -958,7 +958,7 @@ public class InterpreterTests
     @Test
     void testAddImm_NoAuxCarry_NoCarry_Overflow()
     {
-        test(new int[] { Opcode.ADD_IMM.toByte(), 64 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_IMM.toByte(), 64 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 64);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 128);
@@ -969,7 +969,7 @@ public class InterpreterTests
     @Test
     void testAddMem_NoAuxCarry_NoCarry_NoOverflow_LowNibble()
     {
-        test(new int[] { Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
             ram.setRam(10, 3);
         }, ram -> {
@@ -981,7 +981,7 @@ public class InterpreterTests
     @Test
     void testAddMem_NoAuxCarry_NoCarry_NoOverflow_HighNibble()
     {
-        test(new int[] { Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x20);
             ram.setRam(10, 0x30);
         }, ram -> {
@@ -993,7 +993,7 @@ public class InterpreterTests
     @Test
     void testAddMem_AuxCarry_NoCarry_NoOverflow()
     {
-        test(new int[] { Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 9);
             ram.setRam(10, 7);
         }, ram -> {
@@ -1005,7 +1005,7 @@ public class InterpreterTests
     @Test
     void testAddMem_NoAuxCarry_Carry_NoOverflow()
     {
-        test(new int[] { Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x70);
             ram.setRam(10, 0x90);
         }, ram -> {
@@ -1017,7 +1017,7 @@ public class InterpreterTests
     @Test
     void testAddMem_NoAuxCarry_NoCarry_Overflow()
     {
-        test(new int[] { Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADD_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 64);
             ram.setRam(10, 64);
         }, ram -> {
@@ -1194,7 +1194,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_NoAuxCarry_NoCarry_NoOverflow_NoIncomingCarry_LowNibble()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 3 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 5);
@@ -1205,7 +1205,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_NoAuxCarry_NoCarry_NoOverflow_IncomingCarry_LowNibble()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 3 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 3 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -1217,7 +1217,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_NoAuxCarry_NoCarry_NoOverflow_NoIncomingCarry_HighNibble()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 0x30 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 0x30 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x20);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x50);
@@ -1228,7 +1228,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_NoAuxCarry_NoCarry_NoOverflow_IncomingCarry_HighNibble()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 0x30 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 0x30 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x20);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -1240,7 +1240,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_AuxCarry_NoCarry_NoOverflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 7 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 7 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 9);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 16);
@@ -1251,7 +1251,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_AuxCarry_NoCarry_NoOverflow_IncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 7 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 7 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 9);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -1263,7 +1263,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_NoAuxCarry_Carry_NoOverflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 0x90 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 0x90 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x70);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
@@ -1274,7 +1274,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_NoAuxCarry_Carry_NoOverflow_IncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 0x90 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 0x90 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x70);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -1286,7 +1286,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_NoAuxCarry_NoCarry_Overflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 64 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 64 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 64);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 128);
@@ -1297,7 +1297,7 @@ public class InterpreterTests
     @Test
     void testAddcImm_NoAuxCarry_NoCarry_Overflow_IncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_IMM.toByte(), 64 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_IMM.toByte(), 64 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 64);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -1309,7 +1309,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_NoAuxCarry_NoCarry_NoOverflow_NoIncomingCarry_LowNibble()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
             ram.setRam(10, 3);
         }, ram -> {
@@ -1321,7 +1321,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_NoAuxCarry_NoCarry_NoOverflow_IncomingCarry_LowNibble()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 3);
@@ -1334,7 +1334,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_NoAuxCarry_NoCarry_NoOverflow_NoIncomingCarry_HighNibble()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x20);
             ram.setRam(10, 0x30);
         }, ram -> {
@@ -1346,7 +1346,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_NoAuxCarry_NoCarry_NoOverflow_IncomingCarry_HighNibble()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x20);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 0x30);
@@ -1359,7 +1359,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_AuxCarry_NoCarry_NoOverflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 9);
             ram.setRam(10, 7);
         }, ram -> {
@@ -1371,7 +1371,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_AuxCarry_NoCarry_NoOverflow_IncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 9);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 7);
@@ -1384,7 +1384,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_NoAuxCarry_Carry_NoOverflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x70);
             ram.setRam(10, 0x90);
         }, ram -> {
@@ -1396,7 +1396,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_NoAuxCarry_Carry_NoOverflow_IncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x70);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 0x90);
@@ -1409,7 +1409,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_NoAuxCarry_NoCarry_Overflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 64);
             ram.setRam(10, 64);
         }, ram -> {
@@ -1421,7 +1421,7 @@ public class InterpreterTests
     @Test
     void testAddcMem_NoAuxCarry_NoCarry_Overflow_IncomingCarry()
     {
-        test(new int[] { Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ADDC_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 64);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 64);
@@ -1774,7 +1774,7 @@ public class InterpreterTests
     @Test
     void testOrlMemAcc()
     {
-        test(new int[] { Opcode.ORL_MEM_ACC.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_MEM_ACC.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001010);
             ram.setRam(10, 0b00001100);
         }, ram -> {
@@ -1785,7 +1785,7 @@ public class InterpreterTests
     @Test
     void testOrlMemImm()
     {
-        test(new int[] { Opcode.ORL_MEM_IMM.toByte(), 10, 0b00001010 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_MEM_IMM.toByte(), 10, 0b00001010 }, 0, ram -> {
             ram.setRam(10, 0b00001100);
         }, ram -> {
             ram.setRam(10, 0b00001110);
@@ -1795,7 +1795,7 @@ public class InterpreterTests
     @Test
     void testOrlAccImm()
     {
-        test(new int[] { Opcode.ORL_IMM.toByte(), 0b00001010 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_IMM.toByte(), 0b00001010 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001100);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001110);
@@ -1806,7 +1806,7 @@ public class InterpreterTests
     @Test
     void testOrlAccMem()
     {
-        test(new int[] { Opcode.ORL_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_MEM.toByte(), 10 }, 0, ram -> {
             ram.setRam(10, 0b00001010);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001100);
         }, ram -> {
@@ -1851,7 +1851,7 @@ public class InterpreterTests
     @Test
     void testOrlCBit_Neither()
     {
-        test(new int[] { Opcode.ORL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000000);
             ram.setRam(0x20, 0b00000000);
         }, ram -> {
@@ -1862,7 +1862,7 @@ public class InterpreterTests
     @Test
     void testOrlCBit_Carry()
     {
-        test(new int[] { Opcode.ORL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(0x20, 0b00000000);
         }, ram -> {
@@ -1873,7 +1873,7 @@ public class InterpreterTests
     @Test
     void testOrlCBit_MemBit()
     {
-        test(new int[] { Opcode.ORL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000000);
             ram.setRam(0x20, 0b00010000);
         }, ram -> {
@@ -1884,7 +1884,7 @@ public class InterpreterTests
     @Test
     void testOrlCBit_Both()
     {
-        test(new int[] { Opcode.ORL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(0x20, 0b00010000);
         }, ram -> {
@@ -1895,7 +1895,7 @@ public class InterpreterTests
     @Test
     void testOrlCNbit_Neither()
     {
-        test(new int[] { Opcode.ORL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000000);
             ram.setRam(0x20, 0b00000000);
         }, ram -> {
@@ -1906,7 +1906,7 @@ public class InterpreterTests
     @Test
     void testOrlCNbit_Carry()
     {
-        test(new int[] { Opcode.ORL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(0x20, 0b00000000);
         }, ram -> {
@@ -1917,7 +1917,7 @@ public class InterpreterTests
     @Test
     void testOrlCNbit_MemBit()
     {
-        test(new int[] { Opcode.ORL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000000);
             ram.setRam(0x20, 0b00010000);
         }, ram -> {
@@ -1928,7 +1928,7 @@ public class InterpreterTests
     @Test
     void testOrlCNbit_Both()
     {
-        test(new int[] { Opcode.ORL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ORL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(0x20, 0b00010000);
         }, ram -> {
@@ -1939,7 +1939,7 @@ public class InterpreterTests
     @Test
     void testAnlMemAcc()
     {
-        test(new int[] { Opcode.ANL_MEM_ACC.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_MEM_ACC.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001010);
             ram.setRam(10, 0b00001100);
         }, ram -> {
@@ -1950,7 +1950,7 @@ public class InterpreterTests
     @Test
     void testAnlMemImm()
     {
-        test(new int[] { Opcode.ANL_MEM_IMM.toByte(), 10, 0b00001010 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_MEM_IMM.toByte(), 10, 0b00001010 }, 0, ram -> {
             ram.setRam(10, 0b00001100);
         }, ram -> {
             ram.setRam(10, 0b00001000);
@@ -1960,7 +1960,7 @@ public class InterpreterTests
     @Test
     void testAnlAccImm()
     {
-        test(new int[] { Opcode.ANL_IMM.toByte(), 0b00001010 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_IMM.toByte(), 0b00001010 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001100);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001000);
@@ -1971,7 +1971,7 @@ public class InterpreterTests
     @Test
     void testAnlAccMem()
     {
-        test(new int[] { Opcode.ANL_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_MEM.toByte(), 10 }, 0, ram -> {
             ram.setRam(10, 0b00001010);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001100);
         }, ram -> {
@@ -2016,7 +2016,7 @@ public class InterpreterTests
     @Test
     void testAnlCBit_Neither()
     {
-        test(new int[] { Opcode.ANL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000000);
             ram.setRam(0x20, 0b00000000);
         }, ram -> {
@@ -2027,7 +2027,7 @@ public class InterpreterTests
     @Test
     void testAnlCBit_Carry()
     {
-        test(new int[] { Opcode.ANL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(0x20, 0b00000000);
         }, ram -> {
@@ -2038,7 +2038,7 @@ public class InterpreterTests
     @Test
     void testAnlCBit_MemBit()
     {
-        test(new int[] { Opcode.ANL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000000);
             ram.setRam(0x20, 0b00010000);
         }, ram -> {
@@ -2049,7 +2049,7 @@ public class InterpreterTests
     @Test
     void testAnlCBit_Both()
     {
-        test(new int[] { Opcode.ANL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_C_BIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(0x20, 0b00010000);
         }, ram -> {
@@ -2060,7 +2060,7 @@ public class InterpreterTests
     @Test
     void testAnlCNbit_Neither()
     {
-        test(new int[] { Opcode.ANL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000000);
             ram.setRam(0x20, 0b00000000);
         }, ram -> {
@@ -2071,7 +2071,7 @@ public class InterpreterTests
     @Test
     void testAnlCNbit_Carry()
     {
-        test(new int[] { Opcode.ANL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(0x20, 0b00000000);
         }, ram -> {
@@ -2082,7 +2082,7 @@ public class InterpreterTests
     @Test
     void testAnlCNbit_MemBit()
     {
-        test(new int[] { Opcode.ANL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000000);
             ram.setRam(0x20, 0b00010000);
         }, ram -> {
@@ -2093,7 +2093,7 @@ public class InterpreterTests
     @Test
     void testAnlCNbit_Both()
     {
-        test(new int[] { Opcode.ANL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.ANL_C_NBIT.toByte(), 0x04 /* Byte 20h, Bit 4 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(0x20, 0b00010000);
         }, ram -> {
@@ -2104,7 +2104,7 @@ public class InterpreterTests
     @Test
     void testXrlMemAcc()
     {
-        test(new int[] { Opcode.XRL_MEM_ACC.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.XRL_MEM_ACC.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001010);
             ram.setRam(10, 0b00001100);
         }, ram -> {
@@ -2115,7 +2115,7 @@ public class InterpreterTests
     @Test
     void testXrlMemImm()
     {
-        test(new int[] { Opcode.XRL_MEM_IMM.toByte(), 10, 0b00001010 }, 0, ram -> {
+        test(new int[] { I8051Opcode.XRL_MEM_IMM.toByte(), 10, 0b00001010 }, 0, ram -> {
             ram.setRam(10, 0b00001100);
         }, ram -> {
             ram.setRam(10, 0b00000110);
@@ -2125,7 +2125,7 @@ public class InterpreterTests
     @Test
     void testXrlAccImm()
     {
-        test(new int[] { Opcode.XRL_IMM.toByte(), 0b00001010 }, 0, ram -> {
+        test(new int[] { I8051Opcode.XRL_IMM.toByte(), 0b00001010 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001100);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00000110);
@@ -2135,7 +2135,7 @@ public class InterpreterTests
     @Test
     void testXrlAccMem()
     {
-        test(new int[] { Opcode.XRL_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.XRL_MEM.toByte(), 10 }, 0, ram -> {
             ram.setRam(10, 0b00001010);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b00001100);
         }, ram -> {
@@ -2177,7 +2177,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_NoAuxCarry_NoCarry_NoOverflow_NoIncomingCarry_LowNibble()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 2 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 2 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 3);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 1);
@@ -2188,7 +2188,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_NoAuxCarry_NoCarry_NoOverflow_IncomingCarry_LowNibble()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 2 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 2 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 3);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -2200,7 +2200,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_NoAuxCarry_NoCarry_NoOverflow_NoIncomingCarry_HighNibble()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 0x20 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 0x20 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x30);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x10);
@@ -2211,7 +2211,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_NoAuxCarry_NoCarry_NoOverflow_IncomingCarry_HighNibble()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 0x20 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 0x20 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x31);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -2223,7 +2223,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_AuxCarry_NoCarry_NoOverflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 7 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 7 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 16);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 9);
@@ -2234,7 +2234,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_AuxCarry_NoCarry_NoOverflow_IncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 7 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 7 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 16);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -2246,7 +2246,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_NoAuxCarry_Carry_NoOverflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 0x70 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 0x70 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x90);
@@ -2257,7 +2257,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_NoAuxCarry_Carry_NoOverflow_IncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 0x70 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 0x70 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 1);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -2269,7 +2269,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_NoAuxCarry_NoCarry_Overflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 64 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 64 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 128);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 64);
@@ -2280,7 +2280,7 @@ public class InterpreterTests
     @Test
     void testSubbImm_NoAuxCarry_NoCarry_Overflow_IncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_IMM.toByte(), 64 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_IMM.toByte(), 64 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 129);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -2292,7 +2292,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_NoAuxCarry_NoCarry_NoOverflow_NoIncomingCarry_LowNibble()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 3);
             ram.setRam(10, 2);
         }, ram -> {
@@ -2304,7 +2304,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_NoAuxCarry_NoCarry_NoOverflow_IncomingCarry_LowNibble()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 3);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 2);
@@ -2317,7 +2317,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_NoAuxCarry_NoCarry_NoOverflow_NoIncomingCarry_HighNibble()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x30);
             ram.setRam(10, 0x20);
         }, ram -> {
@@ -2329,7 +2329,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_NoAuxCarry_NoCarry_NoOverflow_IncomingCarry_HighNibble()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x31);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 0x20);
@@ -2342,7 +2342,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_AuxCarry_NoCarry_NoOverflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 16);
             ram.setRam(10, 7);
         }, ram -> {
@@ -2354,7 +2354,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_AuxCarry_NoCarry_NoOverflow_IncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 16);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 7);
@@ -2367,7 +2367,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_NoAuxCarry_Carry_NoOverflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
             ram.setRam(10, 0x70);
         }, ram -> {
@@ -2379,7 +2379,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_NoAuxCarry_Carry_NoOverflow_IncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 1);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 0x70);
@@ -2392,7 +2392,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_NoAuxCarry_NoCarry_Overflow_NoIncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 128);
             ram.setRam(10, 64);
         }, ram -> {
@@ -2404,7 +2404,7 @@ public class InterpreterTests
     @Test
     void testSubbMem_NoAuxCarry_NoCarry_Overflow_IncomingCarry()
     {
-        test(new int[] { Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.SUBB_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 129);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
             ram.setRam(10, 64);
@@ -2757,7 +2757,7 @@ public class InterpreterTests
     @Test
     void testMul_NoOverflow()
     {
-        test(new int[] { Opcode.MUL_AB.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.MUL_AB.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 10);
             ram.setSfr(Constants.ADDRESS_REGISTER_B, 12);
         }, ram -> {
@@ -2769,7 +2769,7 @@ public class InterpreterTests
     @Test
     void testMul_Overflow()
     {
-        test(new int[] { Opcode.MUL_AB.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.MUL_AB.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 25);
             ram.setSfr(Constants.ADDRESS_REGISTER_B, 12);
         }, ram -> {
@@ -2782,7 +2782,7 @@ public class InterpreterTests
     @Test
     void testDiv_NoDivByZero()
     {
-        test(new int[] { Opcode.DIV_AB.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DIV_AB.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 10);
             ram.setSfr(Constants.ADDRESS_REGISTER_B, 3);
         }, ram -> {
@@ -2794,7 +2794,7 @@ public class InterpreterTests
     @Test
     void testDiv_DivByZero()
     {
-        test(new int[] { Opcode.DIV_AB.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DIV_AB.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 10);
             ram.setSfr(Constants.ADDRESS_REGISTER_B, 0);
         }, ram -> {
@@ -2807,7 +2807,7 @@ public class InterpreterTests
     @Test
     void testSetbBit()
     {
-        test(new int[] { Opcode.SETB_BIT.toByte(), Constants.BIT_ADDRESS_FLAG0 }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.SETB_BIT.toByte(), Constants.BIT_ADDRESS_FLAG0 }, 0, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00100000);
         }, 2);
     }
@@ -2815,7 +2815,7 @@ public class InterpreterTests
     @Test
     void testSetbC()
     {
-        test(new int[] { Opcode.SETB_C.toByte() }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.SETB_C.toByte() }, 0, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, 1);
     }
@@ -2823,7 +2823,7 @@ public class InterpreterTests
     @Test
     void testCplAcc()
     {
-        test(new int[] { Opcode.CPL_ACC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.CPL_ACC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0b11010101);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00000001); // mov A,#11010101b would normally set this
         }, ram -> {
@@ -2835,7 +2835,7 @@ public class InterpreterTests
     @Test
     void testCplBit_ZeroToOne()
     {
-        test(new int[] { Opcode.CPL_BIT.toByte(), Constants.BIT_ADDRESS_FLAG0 }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.CPL_BIT.toByte(), Constants.BIT_ADDRESS_FLAG0 }, 0, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00100000);
         }, 2);
     }
@@ -2843,7 +2843,7 @@ public class InterpreterTests
     @Test
     void testCplBit_OneToZero()
     {
-        test(new int[] { Opcode.CPL_BIT.toByte(), Constants.BIT_ADDRESS_FLAG0 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CPL_BIT.toByte(), Constants.BIT_ADDRESS_FLAG0 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00100000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
@@ -2853,7 +2853,7 @@ public class InterpreterTests
     @Test
     void testCplC_ZeroToOne()
     {
-        test(new int[] { Opcode.CPL_C.toByte() }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.CPL_C.toByte() }, 0, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, 1);
     }
@@ -2861,7 +2861,7 @@ public class InterpreterTests
     @Test
     void testCplC_OneToZero()
     {
-        test(new int[] { Opcode.CPL_C.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.CPL_C.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
@@ -2871,7 +2871,7 @@ public class InterpreterTests
     @Test
     void testClrAcc()
     {
-        test(new int[] { Opcode.CLR_ACC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.CLR_ACC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 20);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0);
@@ -2881,7 +2881,7 @@ public class InterpreterTests
     @Test
     void testClrBit()
     {
-        test(new int[] { Opcode.CLR_BIT.toByte(), Constants.BIT_ADDRESS_FLAG0 }, 0, ram -> {
+        test(new int[] { I8051Opcode.CLR_BIT.toByte(), Constants.BIT_ADDRESS_FLAG0 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b00100000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
@@ -2891,7 +2891,7 @@ public class InterpreterTests
     @Test
     void testClrC()
     {
-        test(new int[] { Opcode.CLR_C.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.CLR_C.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0);
@@ -2901,7 +2901,7 @@ public class InterpreterTests
     @Test
     void testSwap()
     {
-        test(new int[] { Opcode.SWAP.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.SWAP.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0xAB);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0xBA);
@@ -2912,7 +2912,7 @@ public class InterpreterTests
     @Test
     void testXchMem()
     {
-        test(new int[] { Opcode.XCH_MEM.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.XCH_MEM.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 10);
             ram.setRam(10, 20);
         }, ram -> {
@@ -2974,7 +2974,7 @@ public class InterpreterTests
     @Test
     void testDa_NoAdjust()
     {
-        test(new int[] { Opcode.DA.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DA.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x25);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x25);
@@ -2985,7 +2985,7 @@ public class InterpreterTests
     @Test
     void testDa_LowAdjust()
     {
-        test(new int[] { Opcode.DA.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DA.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x2B);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x31);
@@ -2996,7 +2996,7 @@ public class InterpreterTests
     @Test
     void testDa_HighAdjust()
     {
-        test(new int[] { Opcode.DA.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DA.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0xB5);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x15);
@@ -3007,7 +3007,7 @@ public class InterpreterTests
     @Test
     void testDa_BothAdjust()
     {
-        test(new int[] { Opcode.DA.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DA.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x9B);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x01);
@@ -3018,7 +3018,7 @@ public class InterpreterTests
     @Test
     void testDa_IncomingAuxCarry()
     {
-        test(new int[] { Opcode.DA.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DA.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x23);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b01000000);
         }, ram -> {
@@ -3030,7 +3030,7 @@ public class InterpreterTests
     @Test
     void testDa_IncomingCarry()
     {
-        test(new int[] { Opcode.DA.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.DA.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 0x25);
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
@@ -3042,7 +3042,7 @@ public class InterpreterTests
     @Test
     void testMovAccImm()
     {
-        test(new int[] { Opcode.MOV_ACC_IMM.toByte(), 20 }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.MOV_ACC_IMM.toByte(), 20 }, 0, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 20);
         }, 2);
     }
@@ -3050,7 +3050,7 @@ public class InterpreterTests
     @Test
     void testMovMemImm()
     {
-        test(new int[] { Opcode.MOV_MEM_IMM.toByte(), 10, 20 }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.MOV_MEM_IMM.toByte(), 10, 20 }, 0, ram -> {}, ram -> {
             ram.setRam(10, 20);
         }, 3);
     }
@@ -3084,7 +3084,7 @@ public class InterpreterTests
     @Test
     void testMovMemMem()
     {
-        test(new int[] { Opcode.MOV_MEM_MEM.toByte(), 10, 20 }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOV_MEM_MEM.toByte(), 10, 20 }, 0, ram -> {
             ram.setRam(20, 30);
         }, ram -> {
             ram.setRam(10, 30);
@@ -3123,7 +3123,7 @@ public class InterpreterTests
     @Test
     void testMovAccMem()
     {
-        test(new int[] { Opcode.MOV_ACC_MEM.toByte(), 20 }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOV_ACC_MEM.toByte(), 20 }, 0, ram -> {
             ram.setRam(20, 30);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 30);
@@ -3162,7 +3162,7 @@ public class InterpreterTests
     @Test
     void testMovMemAcc()
     {
-        test(new int[] { Opcode.MOV_MEM_ACC.toByte(), 20 }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOV_MEM_ACC.toByte(), 20 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 30);
         }, ram -> {
             ram.setRam(20, 30);
@@ -3201,7 +3201,7 @@ public class InterpreterTests
     @Test
     void testMovDptr()
     {
-        test(new int[] { Opcode.MOV_DPTR.toByte(), 0x12, 0x34 }, 0, ram -> {}, ram -> {
+        test(new int[] { I8051Opcode.MOV_DPTR.toByte(), 0x12, 0x34 }, 0, ram -> {}, ram -> {
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_UPPER, 0x12);
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_LOWER, 0x34);
         }, 3);
@@ -3210,7 +3210,7 @@ public class InterpreterTests
     @Test
     void testMovBitC()
     {
-        test(new int[] { Opcode.MOV_BIT_C.toByte(), 0x07 /* Byte 20h, Bit 7 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOV_BIT_C.toByte(), 0x07 /* Byte 20h, Bit 7 */ }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
         }, ram -> {
             ram.setRam(0x20, 0b10000000);
@@ -3220,7 +3220,7 @@ public class InterpreterTests
     @Test
     void testMovCBit()
     {
-        test(new int[] { Opcode.MOV_C_BIT.toByte(), 0x07 /* Byte 20h, Bit 7 */ }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOV_C_BIT.toByte(), 0x07 /* Byte 20h, Bit 7 */ }, 0, ram -> {
             ram.setRam(0x20, 0b10000000);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_STATUS_WORD, 0b10000000);
@@ -3230,7 +3230,7 @@ public class InterpreterTests
     @Test
     void testMovcAccIapc()
     {
-        test(new int[] { Opcode.MOVC_ACC_IAPC.toByte(), Opcode.NOP.toByte(), Opcode.NOP.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOVC_ACC_IAPC.toByte(), I8051Opcode.NOP.toByte(), I8051Opcode.NOP.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
         }, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 10);
@@ -3240,7 +3240,7 @@ public class InterpreterTests
     @Test
     void testMovcAccIadptr()
     {
-        test(new int[] { Opcode.MOVC_ACC_IADPTR.toByte(), Opcode.NOP.toByte(), Opcode.NOP.toByte(), 10 }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOVC_ACC_IADPTR.toByte(), I8051Opcode.NOP.toByte(), I8051Opcode.NOP.toByte(), 10 }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_LOWER, 1);
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 2);
         }, ram -> {
@@ -3251,7 +3251,7 @@ public class InterpreterTests
     @Test
     void testMovxAccIdptr()
     {
-        test(new int[] { Opcode.MOVX_ACC_IDPTR.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOVX_ACC_IDPTR.toByte() }, 0, ram -> {
             ram.setExt(10, 127);
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_LOWER, 10);
         }, ram -> {
@@ -3279,7 +3279,7 @@ public class InterpreterTests
     @Test
     void testMovxIdptrAcc()
     {
-        test(new int[] { Opcode.MOVX_IDPTR_ACC.toByte() }, 0, ram -> {
+        test(new int[] { I8051Opcode.MOVX_IDPTR_ACC.toByte() }, 0, ram -> {
             ram.setSfr(Constants.ADDRESS_ACCUMULATOR, 127);
             ram.setSfr(Constants.ADDRESS_DATA_POINTER_LOWER, 10);
         }, ram -> {

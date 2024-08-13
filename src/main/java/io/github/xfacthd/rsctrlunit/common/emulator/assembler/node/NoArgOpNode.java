@@ -1,8 +1,8 @@
 package io.github.xfacthd.rsctrlunit.common.emulator.assembler.node;
 
-import io.github.xfacthd.rsctrlunit.common.emulator.opcode.Opcode;
+import io.github.xfacthd.rsctrlunit.common.emulator.core.i8051.I8051Opcode;
 
-public record NoArgOpNode(int line, Opcode opcode) implements OpNode
+public record NoArgOpNode(int line, I8051Opcode opcode) implements OpNode
 {
     @Override
     public int appendOperands(byte[] code, int pointer)
@@ -10,7 +10,7 @@ public record NoArgOpNode(int line, Opcode opcode) implements OpNode
         return pointer;
     }
 
-    public static NoArgOpNode create(int line, Opcode opcode, @SuppressWarnings("unused") String[] operands)
+    public static NoArgOpNode create(int line, I8051Opcode opcode, @SuppressWarnings("unused") String[] operands)
     {
         return new NoArgOpNode(line, opcode);
     }

@@ -1,0 +1,314 @@
+package io.github.xfacthd.rsctrlunit.common.emulator.core.i8051;
+
+import com.google.common.collect.Sets;
+import io.github.xfacthd.rsctrlunit.common.emulator.assembler.Assembler;
+import io.github.xfacthd.rsctrlunit.common.emulator.assembler.Directive;
+import io.github.xfacthd.rsctrlunit.common.emulator.assembler.ErrorPrinter;
+import io.github.xfacthd.rsctrlunit.common.emulator.assembler.node.*;
+import io.github.xfacthd.rsctrlunit.common.emulator.assembler.node.directive.DefineByteDirectiveNode;
+import io.github.xfacthd.rsctrlunit.common.emulator.assembler.node.directive.EndDirectiveNode;
+import io.github.xfacthd.rsctrlunit.common.emulator.assembler.node.directive.OriginDirectiveNode;
+import io.github.xfacthd.rsctrlunit.common.emulator.opcode.OpcodeHelpers;
+import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
+import io.github.xfacthd.rsctrlunit.common.emulator.util.Constants;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.StringReader;
+import java.util.*;
+
+public class I8051Assembler extends Assembler {
+
+    public I8051Assembler() {
+        super();
+    }
+
+    private static final String[] EMPTY_ARRAY = new String[0];
+    private static final I8051Opcode[] AJMP_OPCODES = new I8051Opcode[] {
+            I8051Opcode.AJMP_000, I8051Opcode.AJMP_001, I8051Opcode.AJMP_010, I8051Opcode.AJMP_011, I8051Opcode.AJMP_100, I8051Opcode.AJMP_101, I8051Opcode.AJMP_110, I8051Opcode.AJMP_111
+    };
+    private static final I8051Opcode[] ACALL_OPCODES = new I8051Opcode[] {
+            I8051Opcode.ACALL_000, I8051Opcode.ACALL_001, I8051Opcode.ACALL_010, I8051Opcode.ACALL_011, I8051Opcode.ACALL_100, I8051Opcode.ACALL_101, I8051Opcode.ACALL_110, I8051Opcode.ACALL_111
+    };
+
+
+    public Code assemble(String name, String source, ErrorPrinter errorPrinter) {
+        List<Node> nodes = parseSource(source, errorPrinter);
+        if (nodes.isEmpty()) return Code.EMPTY;
+        if (!validateLabels(nodes, errorPrinter)) return Code.EMPTY;
+
+        int codeSize = computeCodeSize(nodes, errorPrinter);
+        if (codeSize <= 0) return Code.EMPTY;
+        byte[] code = new byte[codeSize];
+        return buildRomImage(name, nodes, code, errorPrinter);
+    }
+
+    protected List<Node> parseSource(String source, ErrorPrinter errorPrinter) {
+        List<Node> nodes = new ArrayList<>();
+        try (LineNumberReader reader = new LineNumberReader(new StringReader(source)))
+        {
+            while (reader.ready())
+            {
+                int lineNum = reader.getLineNumber() + 1;
+                String line = reader.readLine();
+                if (line == null) break;
+
+                int commentStart = line.indexOf(';');
+                if (commentStart >= 0)
+                {
+                    line = line.substring(0, commentStart);
+                }
+                line = line.trim();
+                if (line.isEmpty())
+                {
+                    continue;
+                }
+
+                if (line.endsWith(":"))
+                {
+                    nodes.add(new LabelNode(lineNum, line.substring(0, line.length() - 1)));
+                    continue;
+                }
+
+                String[] parts = line.split(" ");
+                Node directiveNode = Directive.parseDirective(lineNum, parts);
+                if (directiveNode instanceof ErrorNode error)
+                {
+                    errorPrinter.error(error.error());
+                    return List.of();
+                }
+                else if (directiveNode instanceof EndDirectiveNode)
+                {
+                    break;
+                }
+                else if (directiveNode != null)
+                {
+                    nodes.add(directiveNode);
+                    continue;
+                }
+
+                String[] operands = extractOperands(parts);
+                Node node = I8051Opcode.parse(lineNum, parts[0].toLowerCase(Locale.ROOT), operands);
+                if (node instanceof ErrorNode error)
+                {
+                    errorPrinter.error(error.error());
+                    return List.of();
+                }
+                nodes.add(node);
+            }
+        }
+        catch (IOException e)
+        {
+            return List.of();
+        }
+        return nodes;
+    }
+
+    protected String[] extractOperands(String[] parts)
+    {
+        if (parts.length == 1) return EMPTY_ARRAY;
+
+        String operands = parts[1];
+        if (parts.length > 2)
+        {
+            StringBuilder builder = new StringBuilder(operands);
+            for (int i = 2; i < parts.length; i++)
+            {
+                builder.append(parts[i]);
+            }
+            operands = builder.toString();
+        }
+        return operands.split(",");
+    }
+
+    protected boolean validateLabels(List<Node> nodes, ErrorPrinter errorPrinter)
+    {
+        boolean valid = true;
+
+        Map<String, LabelNode> existingLabels = new HashMap<>();
+        for (Node node : nodes)
+        {
+            if (!(node instanceof LabelNode labelNode)) continue;
+
+            String label = labelNode.label();
+            if (existingLabels.containsKey(label))
+            {
+                errorPrinter.error("Duplicate label '%s' defined on line %d", label, labelNode.label());
+                valid = false;
+                continue;
+            }
+            existingLabels.put(label, labelNode);
+        }
+
+        Set<String> usedLabels = new HashSet<>();
+        for (Node node : nodes)
+        {
+            if (!(node instanceof JumpNode jumpNode)) continue;
+
+            String target = jumpNode.label();
+            if (!existingLabels.containsKey(target))
+            {
+                errorPrinter.error("Undefined label '%s' on line %d", target, node.line());
+                valid = false;
+            }
+            usedLabels.add(target);
+        }
+
+        for (String unusedLabel : Sets.difference(existingLabels.keySet(), usedLabels))
+        {
+            int line = existingLabels.get(unusedLabel).line();
+            errorPrinter.warning("Unused label '%s' on line %d", unusedLabel, line);
+        }
+
+        return valid;
+    }
+
+    protected int computeCodeSize(List<Node> nodes, ErrorPrinter errorPrinter)
+    {
+        int size = 0;
+        boolean skip = false;
+        for (Node node : nodes)
+        {
+            if (node instanceof OpNode opNode && !skip)
+            {
+                size += 1 + opNode.opcode().getOperandBytes();
+            }
+            else if (node instanceof OriginDirectiveNode org)
+            {
+                if (size < org.origin())
+                {
+                    size = org.origin();
+                    skip = false;
+                }
+                else
+                {
+                    skip = true;
+                }
+            }
+            else if (node instanceof DefineByteDirectiveNode dbNode && !skip)
+            {
+                size += dbNode.data().length;
+            }
+        }
+        if (size > Constants.ROM_SIZE)
+        {
+            errorPrinter.error("Assembled code size %d exceeds maximum ROM size %d", size, Constants.ROM_SIZE);
+            return -1;
+        }
+        return size;
+    }
+
+    protected Code buildRomImage(String name, List<Node> nodes, byte[] codeBytes, ErrorPrinter errorPrinter)
+    {
+        record UnresolvedJump(int opPointer, JumpNode node) { }
+
+        int pointer = 0;
+        Object2IntMap<String> resolvedLabels = new Object2IntOpenHashMap<>();
+        Map<String, List<UnresolvedJump>> unresolvedJumps = new HashMap<>();
+        for (Node node : nodes)
+        {
+            if (node instanceof LabelNode labelNode)
+            {
+                resolvedLabels.put(labelNode.label(), pointer);
+                continue;
+            }
+            if (node instanceof OriginDirectiveNode orgNode)
+            {
+                pointer = orgNode.origin();
+                continue;
+            }
+            if (node instanceof DefineByteDirectiveNode dbNode)
+            {
+                System.arraycopy(dbNode.data(), 0, codeBytes, pointer, dbNode.data().length);
+                pointer += dbNode.data().length;
+                continue;
+            }
+
+            if (!(node instanceof OpNode opNode)) continue;
+
+            int opPointer = pointer;
+            codeBytes[pointer] = opNode.opcode().toByte();
+            pointer++;
+            pointer = opNode.appendOperands(codeBytes, pointer);
+
+            if (node instanceof JumpNode jumpNode)
+            {
+                unresolvedJumps.computeIfAbsent(jumpNode.label(), $ -> new ArrayList<>())
+                        .add(new UnresolvedJump(opPointer, jumpNode));
+            }
+        }
+
+        Int2ObjectMap<String> labelsByPosition = new Int2ObjectOpenHashMap<>();
+
+        for (Map.Entry<String, List<UnresolvedJump>> entry : unresolvedJumps.entrySet())
+        {
+            String label = entry.getKey();
+            int labelPointer = resolvedLabels.getInt(label);
+
+            labelsByPosition.put(labelPointer, label);
+
+            for (UnresolvedJump jump : entry.getValue())
+            {
+                switch (jump.node.opcode())
+                {
+                    case AJMP_000, ACALL_000 ->
+                    {
+                        int bits = 32 - Integer.numberOfLeadingZeros(labelPointer);
+                        if (bits > 11 || OpcodeHelpers.calculateAjmpTarget(jump.opPointer + 2, labelPointer) != labelPointer)
+                        {
+                            errorPrinter.error("%s target %d on line %d exceeds max range", jump.node.opcode().getMnemonic(), labelPointer, jump.node.line());
+                            return Code.EMPTY;
+                        }
+
+                        int topBits = (labelPointer >> 8) & 0x00000111;
+                        I8051Opcode op = jump.node.opcode() == I8051Opcode.AJMP_000 ? AJMP_OPCODES[topBits] : ACALL_OPCODES[topBits];
+                        codeBytes[jump.opPointer] = op.toByte();
+                        codeBytes[jump.opPointer + 1] = (byte) (labelPointer & 0xFF);
+                    }
+                    case LJMP, LCALL ->
+                    {
+                        codeBytes[jump.opPointer + 1] = (byte) ((labelPointer >> 8) & 0xFF);
+                        codeBytes[jump.opPointer + 2] = (byte) (labelPointer & 0xFF);
+                    }
+                    case JC, JNC, JZ, JNZ, SJMP, DJNZ_DR0, DJNZ_DR1, DJNZ_DR2, DJNZ_DR3, DJNZ_DR4, DJNZ_DR5, DJNZ_DR6, DJNZ_DR7 ->
+                    {
+                        int offset = calculateShortJumpOffset(jump.opPointer + 2, labelPointer);
+                        if (offset == Integer.MAX_VALUE)
+                        {
+                            errorPrinter.error("%s target %d on line %d exceeds max range", jump.node.opcode().getMnemonic(), labelPointer, jump.node.line());
+                            return Code.EMPTY;
+                        }
+                        codeBytes[jump.opPointer + 1] = (byte) offset;
+                    }
+                    case JBC, JB, JNB, JMP, CJNE_ACC_IMM,
+                         CJNE_ACC_MEM,
+                         CJNE_IR0_IMM, CJNE_IR1_IMM,
+                         CJNE_DR0_IMM, CJNE_DR1_IMM, CJNE_DR2_IMM, CJNE_DR3_IMM, CJNE_DR4_IMM, CJNE_DR5_IMM, CJNE_DR6_IMM, CJNE_DR7_IMM,
+                         DJNZ_MEM ->
+                    {
+                        int offset = calculateShortJumpOffset(jump.opPointer + 3, labelPointer);
+                        if (offset == Integer.MAX_VALUE)
+                        {
+                            errorPrinter.error("%s target %d on line %d exceeds max range", jump.node.opcode().getMnemonic(), labelPointer, jump.node.line());
+                            return Code.EMPTY;
+                        }
+                        codeBytes[jump.opPointer + 2] = (byte) offset;
+                    }
+                    default -> throw new IllegalArgumentException("Unrecognized jump opcode: " + jump.node.opcode());
+                }
+            }
+        }
+
+        return new Code(name, codeBytes, labelsByPosition);
+    }
+
+    protected static int calculateShortJumpOffset(int src, int dest)
+    {
+        int diff = dest - src;
+        return (diff > 127 || diff < -128) ? Integer.MAX_VALUE : ((byte) diff);
+    }
+}

@@ -6,7 +6,7 @@ import io.github.xfacthd.rsctrlunit.common.emulator.util.Constants;
 import io.github.xfacthd.rsctrlunit.common.util.Utils;
 import net.minecraft.nbt.CompoundTag;
 
-final class Interrupts
+public final class Interrupts
 {
     private static final int NO_ISR = -1;
     private static final int[] ISR_ADDRESSES = new int[] {
@@ -99,7 +99,7 @@ final class Interrupts
         return null;
     }
 
-    void returnFromIsr()
+    public void returnFromIsr()
     {
         if (activeIsrHighPrio != null)
         {

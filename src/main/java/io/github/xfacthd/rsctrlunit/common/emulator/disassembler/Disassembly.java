@@ -13,15 +13,15 @@ public final class Disassembly
     private final List<String> lines = new ArrayList<>();
     private final Int2IntMap lineIndexByProgramCounter = new Int2IntOpenHashMap();
 
-    Disassembly() { }
+    public Disassembly() { }
 
-    void addCodeLine(int programCounter, String line)
+    public void addCodeLine(int programCounter, String line)
     {
         lines.add(line);
         lineIndexByProgramCounter.put(programCounter, lines.size() - 1);
     }
 
-    void addLabelLine(String line)
+    public void addLabelLine(String line)
     {
         lines.add(line);
     }
