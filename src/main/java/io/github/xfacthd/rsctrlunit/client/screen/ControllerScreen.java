@@ -4,6 +4,7 @@ import io.github.xfacthd.rsctrlunit.client.screen.popup.EditPortMappingScreen;
 import io.github.xfacthd.rsctrlunit.client.screen.widget.*;
 import io.github.xfacthd.rsctrlunit.client.util.ClientUtils;
 import io.github.xfacthd.rsctrlunit.common.RCUContent;
+import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.emulator.disassembler.Disassembler;
 import io.github.xfacthd.rsctrlunit.common.emulator.disassembler.Disassembly;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
@@ -581,7 +582,7 @@ public final class ControllerScreen extends CardInventoryContainerScreen<Control
 
     public void updateDisassembly()
     {
-        disassembly = Disassembler.disassemble(menu.getCode());
+        disassembly = CPUCore.CPU8051.disassembler.disassemble(menu.getCode());
         codeHorOffset = 0;
         codeVertOffset = 0;
 

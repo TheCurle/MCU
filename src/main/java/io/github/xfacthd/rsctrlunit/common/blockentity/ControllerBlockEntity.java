@@ -1,8 +1,10 @@
 package io.github.xfacthd.rsctrlunit.common.blockentity;
 
 import io.github.xfacthd.rsctrlunit.common.RCUContent;
+import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.emulator.interpreter.*;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
+import io.github.xfacthd.rsctrlunit.common.emulator.util.Constants;
 import io.github.xfacthd.rsctrlunit.common.redstone.RedstoneInterface;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +30,7 @@ public final class ControllerBlockEntity extends BlockEntity
     public static final Component TITLE = Component.translatable("menu.rsctrlunit.controller");
     public static final ModelProperty<int[]> PORT_MAPPING_PROPERTY = new ModelProperty<>();
 
-    private final Interpreter interpreter = new Interpreter();
+    private final Interpreter interpreter = new Interpreter(new Interpreter.InterpreterContext(CPUCore.CPU8051, Constants.ROM_SIZE, Constants.RAM_SIZE, Constants.SFR_SIZE, Constants.EXT_RAM_SIZE));
     private final Timers timers = interpreter.getTimers();
     private final RedstoneInterface redstone = new RedstoneInterface(this);
     // Keep around the chunk holding this BE to avoid having to look it up every tick to mark it as unsaved

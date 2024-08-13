@@ -1,5 +1,6 @@
 package io.github.xfacthd.rsctrlunit;
 
+import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.emulator.interpreter.Interpreter;
 import io.github.xfacthd.rsctrlunit.common.emulator.core.i8051.I8051Opcode;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
@@ -3310,15 +3311,15 @@ public class InterpreterTests
             int expectedPC
     )
     {
-        Interpreter interpreter = new Interpreter();
+        Interpreter interpreter = new Interpreter(new Interpreter.InterpreterContext(CPUCore.CPU8051, Constants.ROM_SIZE, Constants.RAM_SIZE, Constants.SFR_SIZE, Constants.EXT_RAM_SIZE));
         // Build ROM, padded by NOP until initial PC value
         byte[] romBytes = new byte[initialPc + code.length];
         for (int i = 0; i < code.length; i++)
         {
             romBytes[initialPc + i] = (byte) (code[i] & 0xFF);
         }
-        interpreter.loadCode(new Code("test", romBytes, Int2ObjectMaps.emptyMap()));
-        interpreter.setProgramCounter(initialPc);
+        interpreter.loadCode(new Code("test", romBytes, Int2ObjectMaps.emptyMap(), "8051"));
+        interpreter.getContext().setProgramCounter(initialPc);
 
         // Set up data needed for test
         setupModifier.modify(new RamAdapter(interpreter.getRam(), interpreter.getSfr(), interpreter.getExtRam()));
@@ -3336,7 +3337,7 @@ public class InterpreterTests
         byte[] sfrActual = interpreter.getSfr();
         byte[] extActual = interpreter.getExtRam();
 
-        Assertions.assertEquals(expectedPC, interpreter.getProgramCounter(), "ProgramCounter does not match expected");
+        Assertions.assertEquals(expectedPC, interpreter.getContext().getProgramCounter(), "ProgramCounter does not match expected");
         Assertions.assertArrayEquals(ramExpected, ramActual, "RAM does not match expected");
         Assertions.assertArrayEquals(sfrExpected, sfrActual, "SFR does not match expected");
         Assertions.assertArrayEquals(extExpected, extActual, "External RAM does not match expected");

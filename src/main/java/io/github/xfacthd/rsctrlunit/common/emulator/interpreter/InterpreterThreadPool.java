@@ -3,6 +3,7 @@ package io.github.xfacthd.rsctrlunit.common.emulator.interpreter;
 import io.github.xfacthd.rsctrlunit.RedstoneControllerUnit;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
@@ -36,10 +37,11 @@ public final class InterpreterThreadPool
         future.cancel(false);
     }
 
-    private static void onServerStarting(ServerStartingEvent event)
+    private static void onServerStarting(ServerAboutToStartEvent event)
     {
         currentServer = event.getServer();
         executors = Executors.newScheduledThreadPool(1, Thread.ofVirtual().factory());
+
     }
 
     private static void onServerStopped(ServerStoppedEvent event)

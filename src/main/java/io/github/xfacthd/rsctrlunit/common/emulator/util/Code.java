@@ -2,6 +2,7 @@ package io.github.xfacthd.rsctrlunit.common.emulator.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.util.RCUCodecs;
 import io.github.xfacthd.rsctrlunit.common.util.Utils;
 import io.netty.buffer.ByteBuf;
@@ -10,6 +11,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
@@ -17,12 +19,12 @@ import net.minecraft.world.item.component.TooltipProvider;
 import java.util.*;
 import java.util.function.Consumer;
 
-public record Code(String name, byte[] rom, Int2ObjectMap<String> labels) implements TooltipProvider
-{
+public record Code(String name, byte[] rom, Int2ObjectMap<String> labels, String core) implements TooltipProvider  {
     public static final Codec<Code> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             Codec.STRING.fieldOf("name").forGetter(Code::name),
             RCUCodecs.BYTE_ARRAY.fieldOf("rom").forGetter(Code::rom),
-            RCUCodecs.int2ObjectMap(Codec.STRING).fieldOf("labels").forGetter(Code::labels)
+            RCUCodecs.int2ObjectMap(Codec.STRING).fieldOf("labels").forGetter(Code::labels),
+            Codec.STRING.fieldOf("core").forGetter(Code::core)
     ).apply(inst, Code::new));
     public static final StreamCodec<ByteBuf, Code> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
@@ -31,9 +33,11 @@ public record Code(String name, byte[] rom, Int2ObjectMap<String> labels) implem
             Code::rom,
             ByteBufCodecs.map(Int2ObjectOpenHashMap::new, ByteBufCodecs.VAR_INT, ByteBufCodecs.STRING_UTF8),
             Code::labels,
+            ByteBufCodecs.STRING_UTF8,
+            Code::core,
             Code::new
     );
-    public static final Code EMPTY = new Code("", new byte[0], Int2ObjectMaps.emptyMap());
+    public static final Code EMPTY = new Code("", new byte[0], Int2ObjectMaps.emptyMap(), "");
     public static final Component EMPTY_NAME = Component.translatable("rsctrlunit.code.name.empty").withStyle(ChatFormatting.ITALIC);
 
     public Component displayName()
@@ -47,7 +51,7 @@ public record Code(String name, byte[] rom, Int2ObjectMap<String> labels) implem
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Code code = (Code) o;
-        return Arrays.equals(rom, code.rom) && Objects.equals(labels, code.labels);
+        return Arrays.equals(rom, code.rom) && Objects.equals(labels, code.labels) && Objects.equals(core, code.core);
     }
 
     @Override
@@ -59,7 +63,7 @@ public record Code(String name, byte[] rom, Int2ObjectMap<String> labels) implem
     @Override
     public String toString()
     {
-        return String.format(Locale.ROOT, "Code[name=%s, rom=%s, labels=%s]", name, Utils.toHexString(rom), labels);
+        return String.format(Locale.ROOT, "Code[name=%s, rom=%s, labels=%s, core=%s]", name, Utils.toHexString(rom), labels, core);
     }
 
     @Override

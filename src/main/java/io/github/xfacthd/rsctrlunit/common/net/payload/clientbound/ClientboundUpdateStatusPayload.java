@@ -30,7 +30,7 @@ public record ClientboundUpdateStatusPayload(int windowId, InterpreterState stat
             byte[] ram = interp.getRam().clone();
             byte[] sfr = interp.getSfr().clone();
             IOPorts ports = interp.getIoPorts();
-            int programCounter = interp.getProgramCounter();
+            int programCounter = interp.getContext().getProgramCounter();
             return new InterpreterState(ram, sfr, ports.getPortStatesOut(), ports.getPortStatesIn(), programCounter);
         }));
     }

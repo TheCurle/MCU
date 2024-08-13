@@ -13,18 +13,45 @@ import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.*;
 
-public final class Interpreter
-{
+/**
+ * Handles, manages and executes instructions for a single CPU core.
+ * Execution can be paused and stepped, and coordinated with an external control system.
+ */
+public final class Interpreter {
 
-    public class InterpreterContext {
-        public final CPUCore core = CPUCore.CPU8051;
-        public final ReentrantLock lock = new ReentrantLock();
-        public final byte[] rom = new byte[Constants.ROM_SIZE];
-        public final IOPorts ioPorts = new IOPorts();
-        public final RAM ram = new RAM(ioPorts);
-        public final Timers timers = new Timers(ram, ioPorts);
-        public final Interrupts interrupts = new Interrupts(ram);
-        public final byte[] extRam = new byte[Constants.EXT_RAM_SIZE];
+    /**
+     * Holds all of the data that the interpreter uses.
+     * This is:
+     *  * the type of CPU Core being executed
+     *  * the registers
+     *  * the ROM being executed
+     *  * the program RAM
+     *  * the external RAM
+     *  * I/O port handlers
+     *  * system timers
+     *  * interrupt vectors & control units
+     * These are outside of the interpreter so that we can pass them around to Opcode functions very simply.
+     */
+    public static class InterpreterContext {
+        public final CPUCore core;
+        public final ReentrantLock lock;
+        public final byte[] rom;
+        public final IOPorts ioPorts;
+        public final RAM ram;
+        public final Timers timers;
+        public final Interrupts interrupts;
+        public final byte[] extRam;
+
+        public InterpreterContext(CPUCore core, int romSize, int ramSize, int sfrSize, int extRAMSize) {
+            this.core = core;
+            this.lock = new ReentrantLock();
+            this.rom = new byte[romSize];
+            this.ioPorts = new IOPorts();
+            this.ram = new RAM(ioPorts, ramSize, sfrSize);
+            this.timers = new Timers(ram, ioPorts);
+            this.interrupts = new Interrupts(ram);
+            this.extRam = new byte[extRAMSize];
+        }
 
         public Code code = Code.EMPTY;
         public int programCounter = 0;
@@ -83,10 +110,18 @@ public final class Interpreter
         }
     }
 
-    private final InterpreterContext context = new InterpreterContext();
+    private final InterpreterContext context;
     private volatile boolean running = false;
     private volatile boolean paused = false;
     private volatile boolean stepRequested = false;
+
+    public Interpreter(InterpreterContext context) {
+        this.context = context;
+    }
+
+    public InterpreterContext getContext() {
+        return context;
+    }
 
     public void run()
     {

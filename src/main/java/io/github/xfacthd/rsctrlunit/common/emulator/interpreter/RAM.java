@@ -8,14 +8,16 @@ import java.util.Arrays;
 
 public final class RAM
 {
-    private final byte[] ram = new byte[Constants.RAM_SIZE];
-    private final byte[] sfr = new byte[Constants.SFR_SIZE];
+    private final byte[] ram;
+    private final byte[] sfr;
     private final IOPorts ioPorts;
     private boolean updatingParity = false;
 
-    public RAM(IOPorts ioPorts)
+    public RAM(IOPorts ioPorts, int ramSize, int sfrSize)
     {
         this.ioPorts = ioPorts;
+        this.ram = new byte[ramSize];
+        this.sfr = new byte[sfrSize];
     }
 
     public byte readByte(int address)

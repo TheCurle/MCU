@@ -5,6 +5,7 @@ import io.github.xfacthd.rsctrlunit.client.util.*;
 import io.github.xfacthd.rsctrlunit.common.RCUContent;
 import io.github.xfacthd.rsctrlunit.common.emulator.assembler.Assembler;
 import io.github.xfacthd.rsctrlunit.common.emulator.assembler.ErrorPrinter;
+import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Labels;
 import io.github.xfacthd.rsctrlunit.common.menu.ProgrammerMenu;
@@ -449,7 +450,7 @@ public final class ProgrammerScreen extends CardInventoryContainerScreen<Program
         String name = Utils.getFileNameNoExt(filePath);
         List<Component> lines = new ArrayList<>();
         Code code = guardOperation(
-                () -> Assembler.assemble(name, source, new ErrorPrinter.Collecting(lines)),
+                () -> CPUCore.CPU8051.assembler.assemble(name, source, new ErrorPrinter.Collecting(lines)),
                 () -> Component.translatable(MSG_ERROR_ASSEMBLE, filePath.getFileName().toString())
         );
         if (Code.EMPTY.equals(code))
@@ -484,7 +485,7 @@ public final class ProgrammerScreen extends CardInventoryContainerScreen<Program
             byte[] bytes = Files.readAllBytes(filePath);
             String fileName = Utils.getFileNameNoExt(filePath);
             Labels labels = Labels.readFromFile(filePath, bytes);
-            return new Code(fileName, bytes, labels.labels());
+            return new Code(fileName, bytes, labels.labels(), "8051");
         }, () -> Component.translatable(MSG_ERROR_READ_BINARY, filePath.getFileName().toString())));
     }
 

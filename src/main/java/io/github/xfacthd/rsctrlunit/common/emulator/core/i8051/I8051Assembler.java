@@ -303,7 +303,7 @@ public class I8051Assembler extends Assembler {
             }
         }
 
-        return new Code(name, codeBytes, labelsByPosition);
+        return new Code(name, codeBytes, labelsByPosition, "8051");
     }
 
     protected static int calculateShortJumpOffset(int src, int dest)

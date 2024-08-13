@@ -1,7 +1,9 @@
 package io.github.xfacthd.rsctrlunit.common.emulator.core.i8051;
 
+import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.emulator.disassembler.Disassembler;
 import io.github.xfacthd.rsctrlunit.common.emulator.disassembler.Disassembly;
+import io.github.xfacthd.rsctrlunit.common.emulator.opcode.Opcode;
 import io.github.xfacthd.rsctrlunit.common.emulator.opcode.OpcodeHelpers;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Constants;
@@ -34,7 +36,7 @@ public class I8051Disassembler extends Disassembler {
             }
 
             byte romByte = rom[opIndex];
-            I8051Opcode opcode = I8051Opcode.fromRomByte(romByte);
+            I8051Opcode opcode = (I8051Opcode) CPUCore.CPU8051.opcodeFunc.apply(romByte);
             StringBuilder line = new StringBuilder(String.format(Locale.ROOT, CODE_LINE_TEMPLATE, opIndex, opcode.getMnemonic())).append(" ");
             switch (opcode)
             {
@@ -174,7 +176,7 @@ public class I8051Disassembler extends Disassembler {
         {
             int opIndex = counter.getAndIncrement();
             byte romByte = rom[opIndex];
-            I8051Opcode opcode = I8051Opcode.fromRomByte(romByte);
+            I8051Opcode opcode = (I8051Opcode) CPUCore.CPU8051.opcodeFunc.apply(romByte);
             int address = switch (opcode)
             {
                 case SJMP, JC, JNC, JZ, JNZ,
