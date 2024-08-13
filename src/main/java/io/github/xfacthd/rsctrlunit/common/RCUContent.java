@@ -46,6 +46,10 @@ public final class RCUContent
     // region Items
     public static final Holder<Item> ITEM_MEMORY_CARD = ITEMS.registerItem("memory_card", MemoryCardItem::new);
     public static final Holder<Item> ITEM_PROGRAMMER = ITEMS.registerItem("programmer", ProgrammerItem::new);
+    public static final Holder<Item> ITEM_PROCESSOR_8051 = ITEMS.registerItem("processor8051", Item::new);
+    public static final Holder<Item> ITEM_PROCESSOR_8080 = ITEMS.registerItem("processor8080", Item::new);
+    public static final Holder<Item> ITEM_PROCESSOR_8085 = ITEMS.registerItem("processor8085", Item::new);
+    public static final Holder<Item> ITEM_PROCESSOR_z80 = ITEMS.registerItem("processorz80", Item::new);
     // endregion
 
     // region BlockEntities
@@ -73,6 +77,10 @@ public final class RCUContent
                         output.accept(BLOCK_CONTROLLER.value());
                         output.accept(ITEM_MEMORY_CARD.value());
                         output.accept(ITEM_PROGRAMMER.value());
+                        output.accept(ITEM_PROCESSOR_8051.value());
+                        output.accept(ITEM_PROCESSOR_8080.value());
+                        output.accept(ITEM_PROCESSOR_8085.value());
+                        output.accept(ITEM_PROCESSOR_z80.value());
                     })
                     .build()
     );

@@ -46,6 +46,10 @@ public final class RCULanguageProvider extends LanguageProvider
     {
         add(RCUContent.ITEM_MEMORY_CARD.value(), "Memory Card");
         add(RCUContent.ITEM_PROGRAMMER.value(), "Programmer");
+        add(RCUContent.ITEM_PROCESSOR_8051.value(), "8051 Processor");
+        add(RCUContent.ITEM_PROCESSOR_8080.value(), "8080 Processor");
+        add(RCUContent.ITEM_PROCESSOR_8085.value(), "8085 Processor");
+        add(RCUContent.ITEM_PROCESSOR_z80.value(), "Z80 Processor");
     }
 
     private void addGenericTranslations()
