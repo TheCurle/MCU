@@ -2,6 +2,7 @@ package io.github.xfacthd.rsctrlunit;
 
 import io.github.xfacthd.rsctrlunit.common.emulator.assembler.Assembler;
 import io.github.xfacthd.rsctrlunit.common.emulator.assembler.ErrorPrinter;
+import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.network.chat.Component;
@@ -77,14 +78,14 @@ public class AssemblerTests
         {
             romBytes[i] = (byte) (rom[i] & 0xFF);
         }
-        return new Code(name, romBytes, new Int2ObjectOpenHashMap<>(labels));
+        return new Code(name, romBytes, new Int2ObjectOpenHashMap<>(labels), "8051");
     }
 
     private static void test(String source, Code expected)
     {
         List<Component> messages = new ArrayList<>();
         Code code = Assertions.assertDoesNotThrow(
-                () -> Assembler.assemble(expected.name(), source, new ErrorPrinter.Collecting(messages))
+                () -> CPUCore.CPU8051.assembler.assemble(expected.name(), source, new ErrorPrinter.Collecting(messages))
         );
         Assertions.assertTrue(messages.isEmpty(), "Received error messages");
         Assertions.assertNotNull(code, "Assembled code is null");

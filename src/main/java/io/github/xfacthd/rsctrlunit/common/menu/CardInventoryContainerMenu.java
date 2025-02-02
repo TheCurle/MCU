@@ -25,6 +25,8 @@ public abstract class CardInventoryContainerMenu extends AbstractContainerMenu
     protected final Container cardContainer;
     @Nullable
     protected final Slot cardSlot;
+    @Nullable
+    protected final Slot cpuSlot;
 
     protected CardInventoryContainerMenu(MenuType<?> menuType, int windowId, Inventory inventory, BlockPos pos, SlotConfig slotCfg)
     {
@@ -35,11 +37,17 @@ public abstract class CardInventoryContainerMenu extends AbstractContainerMenu
         {
             this.cardContainer = new SimpleContainer(1);
             this.cardSlot = addSlot(new CustomSlot(cardContainer, 0, slotCfg.cardX, slotCfg.cardY, false));
+            this.cpuSlot = null;
+        } else if (slotCfg.hasProcessorSlot) {
+            this.cardContainer = new SimpleContainer(1);
+            this.cpuSlot = addSlot(new CustomSlot(cardContainer, 0, slotCfg.cpuX, slotCfg.cpuY, false));
+            this.cardSlot = null;
         }
         else
         {
             this.cardContainer = null;
             this.cardSlot = null;
+            this.cpuSlot = null;
         }
 
         int x = slotCfg.invX;
@@ -77,7 +85,7 @@ public abstract class CardInventoryContainerMenu extends AbstractContainerMenu
                     return ItemStack.EMPTY;
                 }
             }
-            else if (stack.is(RCUContent.ITEM_MEMORY_CARD))
+            else if (stack.is(RCUContent.ITEM_MEMORY_CARD)) // || stack.is tagged Processor
             {
                 if (!moveItemStackTo(stack, SLOT_CARD, SLOT_CARD + 1, false))
                 {
@@ -117,5 +125,5 @@ public abstract class CardInventoryContainerMenu extends AbstractContainerMenu
 
 
 
-    protected record SlotConfig(boolean hasCardSlot, int invX, int invY, int cardX, int cardY, IntPredicate hotbarSlotLocked) { }
+    protected record SlotConfig(boolean hasCardSlot, boolean hasProcessorSlot, int invX, int invY, int cardX, int cardY, int cpuX, int cpuY, IntPredicate hotbarSlotLocked) { }
 }

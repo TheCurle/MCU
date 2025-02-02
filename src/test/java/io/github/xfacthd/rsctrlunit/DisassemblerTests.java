@@ -1,5 +1,6 @@
 package io.github.xfacthd.rsctrlunit;
 
+import io.github.xfacthd.rsctrlunit.common.emulator.core.CPUCore;
 import io.github.xfacthd.rsctrlunit.common.emulator.disassembler.Disassembler;
 import io.github.xfacthd.rsctrlunit.common.emulator.disassembler.Disassembly;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
@@ -76,12 +77,12 @@ public class DisassemblerTests
         {
             romBytes[i] = (byte) (rom[i] & 0xFF);
         }
-        return new Code(name, romBytes, new Int2ObjectOpenHashMap<>(labels));
+        return new Code(name, romBytes, new Int2ObjectOpenHashMap<>(labels), "8051");
     }
 
     private static void test(Code code, List<String> expectedLines)
     {
-        Disassembly disassembly = Assertions.assertDoesNotThrow(() -> Disassembler.disassemble(code));
+        Disassembly disassembly = Assertions.assertDoesNotThrow(() -> CPUCore.CPU8051.disassembler.disassemble(code));
         List<String> lines = disassembly.getLines();
         Assertions.assertEquals(lines.size(), expectedLines.size());
         for (int i = 0; i < expectedLines.size(); i++)

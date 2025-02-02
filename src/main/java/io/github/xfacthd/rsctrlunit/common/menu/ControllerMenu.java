@@ -28,7 +28,7 @@ import java.util.Objects;
 
 public final class ControllerMenu extends CardInventoryContainerMenu
 {
-    private static final SlotConfig SLOT_CONFIG = new SlotConfig(true, 14, 138, 14, 78, idx -> false);
+    private static final SlotConfig SLOT_CONFIG = new SlotConfig(true, false, 14, 138, 14, 78, 14, 78, idx -> false);
 
     @Nullable
     private final ServerPlayer player;

@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
-abstract class CardInventoryContainerScreen<T extends CardInventoryContainerMenu> extends AbstractContainerScreen<T>
+public abstract class CardInventoryContainerScreen<T extends CardInventoryContainerMenu> extends AbstractContainerScreen<T>
 {
     protected static final int SLOT_SIZE = 18;
     protected static final int SLOT_SIZE_INNER = 16;

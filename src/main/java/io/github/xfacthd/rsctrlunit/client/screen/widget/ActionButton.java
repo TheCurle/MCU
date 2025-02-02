@@ -1,9 +1,11 @@
 package io.github.xfacthd.rsctrlunit.client.screen.widget;
 
 import io.github.xfacthd.rsctrlunit.client.screen.ControllerScreen;
+import io.github.xfacthd.rsctrlunit.client.screen.cpu.CPUScreen;
 import io.github.xfacthd.rsctrlunit.common.net.payload.serverbound.ServerboundControllerActionPayload;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -12,10 +14,10 @@ import java.util.function.Function;
 
 public final class ActionButton extends Button
 {
-    private final ControllerScreen owner;
+    private final CPUScreen owner;
     private final ServerboundControllerActionPayload.Action action;
 
-    public ActionButton(Button.Builder builder, ControllerScreen owner, ServerboundControllerActionPayload.Action action)
+    public ActionButton(Button.Builder builder, CPUScreen owner, ServerboundControllerActionPayload.Action action)
     {
         super(builder);
         this.owner = owner;
@@ -90,7 +92,7 @@ public final class ActionButton extends Button
             throw new UnsupportedOperationException();
         }
 
-        public ActionButton build(ControllerScreen owner, ServerboundControllerActionPayload.Action action)
+        public ActionButton build(CPUScreen owner, ServerboundControllerActionPayload.Action action)
         {
             return new ActionButton(this, owner, action);
         }

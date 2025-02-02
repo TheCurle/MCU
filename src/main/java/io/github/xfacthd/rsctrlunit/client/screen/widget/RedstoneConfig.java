@@ -1,6 +1,7 @@
 package io.github.xfacthd.rsctrlunit.client.screen.widget;
 
 import io.github.xfacthd.rsctrlunit.client.screen.ControllerScreen;
+import io.github.xfacthd.rsctrlunit.client.screen.cpu.CPUScreen;
 import io.github.xfacthd.rsctrlunit.client.util.ClientUtils;
 import io.github.xfacthd.rsctrlunit.common.redstone.port.*;
 import io.github.xfacthd.rsctrlunit.common.util.Utils;
@@ -74,12 +75,12 @@ public final class RedstoneConfig
     public static final ResourceLocation BACKGROUND = Utils.rl("port_config_background");
     public static final ResourceLocation TEXT_FIELD = ResourceLocation.withDefaultNamespace("widget/text_field");
 
-    private final ControllerScreen screen;
+    private final CPUScreen screen;
     private final int port;
     private final int x;
     private final int y;
 
-    public RedstoneConfig(ControllerScreen screen, int port, int x, int y)
+    public RedstoneConfig(CPUScreen screen, int port, int x, int y)
     {
         this.screen = screen;
         this.port = port;

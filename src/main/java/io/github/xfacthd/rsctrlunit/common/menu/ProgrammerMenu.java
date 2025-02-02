@@ -34,7 +34,7 @@ public final class ProgrammerMenu extends CardInventoryContainerMenu
     public ProgrammerMenu(int windowId, Inventory inventory, ItemStack stack, int slot, boolean forBlock, @Nullable ControllerBlockEntity targetController)
     {
         super(RCUContent.MENU_TYPE_PROGRAMMER.get(), windowId, inventory, inventory.player.blockPosition(), new SlotConfig(
-                !forBlock, 9, 129, 9, 93, idx -> idx == slot
+                !forBlock, false, 9, 129, 9, 93, 9, 93, idx -> idx == slot
         ));
         this.progStack = stack;
         this.slot = slot;

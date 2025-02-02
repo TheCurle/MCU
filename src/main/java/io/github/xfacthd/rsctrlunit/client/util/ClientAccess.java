@@ -2,6 +2,8 @@ package io.github.xfacthd.rsctrlunit.client.util;
 
 import io.github.xfacthd.rsctrlunit.client.screen.ControllerScreen;
 import io.github.xfacthd.rsctrlunit.client.screen.ProgrammerScreen;
+import io.github.xfacthd.rsctrlunit.client.screen.cpu.CPUScreen;
+import io.github.xfacthd.rsctrlunit.client.screen.cpu.I8051Screen;
 import io.github.xfacthd.rsctrlunit.common.emulator.util.Code;
 import io.github.xfacthd.rsctrlunit.common.redstone.port.PortConfig;
 import net.minecraft.client.Minecraft;
@@ -13,7 +15,7 @@ public final class ClientAccess
     public static void handleStatusViewUpdate(int windowId, byte[] ram, byte[] sfr, byte[] output, byte[] input, int programCounter)
     {
         Screen screen = Minecraft.getInstance().screen;
-        if (screen instanceof ControllerScreen ctrlScreen && ctrlScreen.getMenu().containerId == windowId)
+        if (screen instanceof I8051Screen ctrlScreen && ctrlScreen.getMenu().containerId == windowId)
         {
             ctrlScreen.updateStatus(ram, sfr, output, input, programCounter);
         }
@@ -22,7 +24,7 @@ public final class ClientAccess
     public static void handleCodeUpdate(int windowId, Code code)
     {
         Screen screen = Minecraft.getInstance().screen;
-        if (screen instanceof ControllerScreen ctrlScreen && ctrlScreen.getMenu().containerId == windowId)
+        if (screen instanceof I8051Screen ctrlScreen && ctrlScreen.getMenu().containerId == windowId)
         {
             ctrlScreen.getMenu().updateCode(code);
             ctrlScreen.updateDisassembly();
@@ -32,7 +34,7 @@ public final class ClientAccess
     public static void handlePortConfigUpdate(int windowId, Direction facing, PortConfig[] configs)
     {
         Screen screen = Minecraft.getInstance().screen;
-        if (screen instanceof ControllerScreen ctrlScreen && ctrlScreen.getMenu().containerId == windowId)
+        if (screen instanceof CPUScreen ctrlScreen && ctrlScreen.getMenu().containerId == windowId)
         {
             ctrlScreen.getMenu().updatePortConfigs(facing, configs);
         }
@@ -50,7 +52,7 @@ public final class ClientAccess
     public static void handlePortMappingUpdate(int windowId, int[] portMapping)
     {
         Screen screen = Minecraft.getInstance().screen;
-        if (screen instanceof ControllerScreen ctrlScreen && ctrlScreen.getMenu().containerId == windowId)
+        if (screen instanceof CPUScreen ctrlScreen && ctrlScreen.getMenu().containerId == windowId)
         {
             ctrlScreen.getMenu().updatePortMapping(portMapping);
         }

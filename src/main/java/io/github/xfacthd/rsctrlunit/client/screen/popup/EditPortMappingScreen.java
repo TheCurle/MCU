@@ -1,6 +1,7 @@
 package io.github.xfacthd.rsctrlunit.client.screen.popup;
 
 import io.github.xfacthd.rsctrlunit.client.screen.ControllerScreen;
+import io.github.xfacthd.rsctrlunit.client.screen.cpu.CPUScreen;
 import io.github.xfacthd.rsctrlunit.client.screen.widget.RedstoneConfig;
 import io.github.xfacthd.rsctrlunit.common.net.payload.serverbound.ServerboundSetPortMappingPayload;
 import io.github.xfacthd.rsctrlunit.common.redstone.RedstoneInterface;
@@ -43,13 +44,13 @@ public final class EditPortMappingScreen extends Screen
     private static final int ENTRY_TOP_Y = TITLE_Y + LINE_HEIGHT + PADDING;
     private static final int CYCLE_BUTTON_TOP_Y = ENTRY_TOP_Y + SMALL_PADDING;
 
-    private final ControllerScreen screen;
+    private final CPUScreen screen;
     private final int[] mapping;
     private int leftPos;
     private int topPos;
     private Button buttonDone;
 
-    public EditPortMappingScreen(ControllerScreen screen)
+    public EditPortMappingScreen(CPUScreen screen)
     {
         super(TITLE);
         this.screen = screen;
